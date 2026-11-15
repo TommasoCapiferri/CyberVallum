@@ -4,9 +4,10 @@ Strumento da riga di comando, con interfaccia desktop in programma, per l'**anal
 Raccoglie in un unico strumento le verifiche che un sistemista esegue di routine: risorse hardware, processi, connettività, dispositivi in rete, servizi e configurazione di sicurezza.
 
 ## Natura del progetto
-CyberSegugio è un **progetto personale di studio**, con due obiettivi:
+CyberSegugio è un **progetto personale di studio**, con tre obiettivi:
 - **applicare in pratica** gli argomenti studiati su sistemi, reti e sicurezza: ciascun argomento diventa una funzione dello strumento;
-- **sperimentare lo sviluppo software assistito dall'intelligenza artificiale**, combinando un modello eseguito in locale (Ollama con Gemma, tramite Cline in VS Code) per lo sviluppo quotidiano e Claude Code per l'architettura e la revisione del codice.
+- **sperimentare lo sviluppo software assistito dall'intelligenza artificiale**, combinando un modello eseguito in locale (Ollama con Gemma, tramite Cline in VS Code) per lo sviluppo quotidiano e Claude Code per l'architettura e la revisione del codice;
+- **garantire la qualità tramite il testing automatico**: il prodotto avrà una sezione dedicata ai test automatici, che copre il motore di analisi, la riga di comando e l'interfaccia desktop. Comprende un laboratorio in macchine virtuali in cui si riproducono guasti di rete reali (DNS non funzionante, gateway irraggiungibile, perdita di pacchetti) per verificare che le diagnosi siano corrette. I dettagli sono nella sezione [Test automatici](#test-automatici-in-programma).
 
 Non è un prodotto finito né un software destinato all'uso professionale: è un ambiente di sperimentazione che cresce in modo incrementale.
 
@@ -33,6 +34,29 @@ Sono definiti la struttura, le regole di sviluppo e la roadmap.
 | `gui` | Interfaccia desktop basata sullo stesso motore della riga di comando |
 
 Lo stato dettagliato e il registro dello sviluppo sono disponibili in [PROGETTO.md](PROGETTO.md).
+
+## Test automatici (in programma)
+Il progetto è pensato per essere verificabile automaticamente fin dall'inizio, su tre livelli:
+
+| Livello | Cosa si verifica | Strumenti |
+|---|---|---|
+| **Motore** | Le funzioni di analisi restituiscono dati strutturati, senza stampare a video: si verificano in isolamento, anche simulando le risposte del sistema | `pytest` |
+| **Riga di comando** | Ogni comando prevede l'opzione `--json`, con un output leggibile da script, test e altri strumenti di automazione | `pytest` |
+| **Interfaccia desktop** | Ogni elemento interattivo ha un **localizzatore stabile**, secondo la convenzione `<modulo>-<tipo>-<nome>` (es. `sistema-btn-aggiorna`) | `pywinauto` e `pytest-qt` per un'interfaccia Qt, oppure `Playwright` con attributi `data-testid` per un'interfaccia basata su tecnologie web |
+
+### Laboratorio di simulazione dei guasti
+Per verificare le funzioni di diagnostica in condizioni realistiche è previsto un ambiente dedicato, basato su **macchine virtuali** e separato dal sistema di sviluppo, in cui riprodurre in modo controllato i problemi più comuni:
+
+| Scenario simulato | Tecnica |
+|---|---|
+| Interfaccia di rete scollegata | Disconnessione della scheda di rete virtuale della VM |
+| Indirizzo IP assente (DHCP non disponibile) | Rete virtuale senza server DHCP; verifica del riconoscimento degli indirizzi 169.254.x.x |
+| Gateway irraggiungibile | Regole del firewall nella VM o gateway inesistente |
+| DNS non funzionante | Server DNS errato o non raggiungibile; risoluzione dei nomi alterata tramite il file `hosts` |
+| Latenza, jitter e perdita di pacchetti | `tc netem` su una VM Linux che fa da router; su Windows strumenti come *clumsy* |
+| Porte bloccate o servizi non in ascolto | Regole del firewall e arresto controllato dei servizi |
+
+Gli stessi test vengono eseguiti su **Windows** e su **Ubuntu**.
 
 ## Uso responsabile
 Le funzioni di analisi della rete devono essere utilizzate **esclusivamente su reti e sistemi di propria proprietà o per i quali si dispone di un'autorizzazione esplicita**.

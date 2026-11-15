@@ -36,6 +36,12 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 5. Codice e commenti in **inglese**, messaggi all'utente in **italiano**.
 6. **Commit con prefisso:** `[locale]` se il lavoro l'ha fatto l'AI locale, `[claude]` se l'ha fatto Claude Code, `[io]` se l'ha fatto lo sviluppatore.
 7. **Una AI alla volta**, e un commit prima di passare all'altra.
+8. **Testabilità fin dall'inizio:**
+   - il **core** non stampa e non legge input: restituisce dati. Le chiamate al sistema (psutil, comandi di rete) stanno dietro piccole funzioni che si possono **sostituire nei test** (mock), così i test non dipendono dal PC su cui girano;
+   - ogni comando della CLI ha l'opzione **`--json`**, con un output stabile e documentato;
+   - **GUI:** ogni elemento interattivo ha un **localizzatore stabile** con la convenzione `<modulo>-<tipo>-<nome>` (es. `sistema-btn-aggiorna`, `diagnosi-tabella-risultati`). Tipi: `btn`, `campo`, `tabella`, `etichetta`, `menu`, `scheda`. In Qt va impostato sia `objectName` sia `accessibleName`; in un'interfaccia web, `data-testid`;
+   - la scelta della GUI (Qt con pywinauto/pytest-qt, oppure tecnologia web con Playwright) si fa quando si arriva al modulo `gui`. Lo sviluppatore conosce già Playwright.
+9. **Simulazione dei guasti solo in VM:** le prove che rompono la rete (scheda scollegata, DNS errato, `tc netem`, firewall) si fanno **solo nelle macchine virtuali del laboratorio**, mai sul PC di sviluppo né sulla rete di casa.
 
 ## Roadmap (collegata al percorso di studio)
 | Modulo | Collegato a | Funzioni | Stato |
@@ -49,12 +55,13 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 | `servizi` | Fase 3 · Sistemi | servizi, log, utenti, spazio su disco | ⬜ |
 | `sicurezza` | Fase 4 · Cybersecurity | controllo dell'hardening, porte aperte sul proprio PC, analisi dei log | ⬜ |
 | `ai` | trasversale | domande in linguaggio naturale sui risultati ("perché il PC è lento?") | ⬜ |
-| `gui` | dopo i primi moduli | interfaccia desktop | ⬜ |
+| `gui` | dopo i primi moduli | interfaccia desktop, con localizzatori per i test | ⬜ |
+| `test-lab` | Fase 0 (VirtualBox) e Fase 1 (Reti) | VM di laboratorio per simulare i guasti: scheda scollegata, niente DHCP, gateway irraggiungibile, DNS errato, latenza e perdita di pacchetti con `tc netem`; test automatici su Windows e Ubuntu | ⬜ |
 
 ## Stato attuale
 - 2026-11-15: progetto creato. Ci sono solo la documentazione e la struttura, **ancora nessun codice**.
 - Git 2.56 e GitHub CLI installati. Repository pubblico: https://github.com/TommasoCapiferri/CyberSegugio (ramo `main`). Dopo ogni commit: `git push`.
-- AI locale: Ollama 0.40.16 installato, in ascolto solo su 127.0.0.1. Modello: da scaricare (proposto `gemma4:12b-it-qat`). Cline: da installare in VS Code.
+- AI locale: Ollama 0.40.16, in ascolto solo su 127.0.0.1. Modello **`gemma4:12b-it-qat`** (7,2 GB) scaricato il 15/11: gira al 100% sulla GPU RTX 5070 a circa 68-71 token/s anche con contesto da 64k (7,7 GB occupati). Contesto predefinito impostato con `OLLAMA_CONTEXT_LENGTH=65536` (variabile d'ambiente dell'utente). Cline: da installare in VS Code e collegare a Ollama.
 
 ## Registro delle sessioni
 | Data | Chi | Cosa è stato fatto |
