@@ -2,7 +2,7 @@
 
 import pytest
 
-from cybersegugio.core import config
+from cybervallum.core import config
 
 
 @pytest.fixture(autouse=True)

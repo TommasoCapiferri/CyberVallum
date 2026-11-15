@@ -1,4 +1,4 @@
-"""Registry of the actions (checks) and test suites that CyberSegugio can run.
+"""Registry of the actions (checks) and test suites that CyberVallum can run.
 
 Every module registers its actions here with a name `<module>.<action>`, a set of
 typed parameters and the `modifica_sistema` flag. CLI, API and GUI never call module
@@ -23,14 +23,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
-from cybersegugio.core.convert import ConversionError, to_type, type_name
+from cybervallum.core.convert import ConversionError, to_type, type_name
 
 # Core modules that register actions on import. New modules are added here.
 BUILTIN_MODULES: list[str] = [
-    "cybersegugio.core.config",
+    "cybervallum.core.config",
 ]
 
-# Project root (the folder that contains `cybersegugio/` and `tests/`).
+# Project root (the folder that contains `cybervallum/` and `tests/`).
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 _NAME_RE = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")

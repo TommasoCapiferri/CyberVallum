@@ -1,10 +1,10 @@
-# CyberSegugio
+# CyberVallum
 
 Strumento da riga di comando, con interfaccia desktop in programma, per l'**analisi del sistema**, la **diagnostica di rete** e i **controlli di sicurezza** su Windows e Linux.
 Raccoglie in un unico strumento le verifiche che un sistemista esegue di routine: risorse hardware, processi, connettività, dispositivi in rete, servizi e configurazione di sicurezza.
 
 ## Natura del progetto
-CyberSegugio è un **progetto personale di studio**, con tre obiettivi:
+CyberVallum è un **progetto personale di studio**, con tre obiettivi:
 - **applicare in pratica** gli argomenti studiati su sistemi, reti e sicurezza: ciascun argomento diventa una funzione dello strumento;
 - **sperimentare lo sviluppo software assistito dall'intelligenza artificiale**, combinando un modello eseguito in locale (Ollama con Gemma, tramite Cline in VS Code) per lo sviluppo quotidiano e Claude Code per l'architettura e la revisione del codice;
 - **garantire la qualità tramite il testing automatico**: il prodotto avrà una sezione dedicata ai test automatici, che copre il motore di analisi, la riga di comando e l'interfaccia desktop. Comprende un laboratorio in macchine virtuali in cui si riproducono guasti di rete reali (DNS non funzionante, gateway irraggiungibile, perdita di pacchetti) per verificare che le diagnosi siano corrette. I dettagli sono nella sezione [Test automatici](#test-automatici-in-programma).
@@ -69,5 +69,4 @@ Distribuito con licenza [MIT](LICENSE).
 
 ---
 
-*Dedicato a Titty, la mia cagnolina, a cui il progetto deve il nome.*
-*Lei trova qualsiasi cosa nascosta in casa al primo colpo: questo strumento ha ancora molta strada da fare per raggiungerla.* 🐶
+*Il nome.* Il *vallum*, in latino, era il terrapieno difensivo che circondava gli accampamenti militari romani: un argine di terra coronato da una palizzata di pali appuntiti (*valli*, da *vallus*, "palo") e preceduto da un fossato. Dalla stessa parola derivano l'italiano *vallo*, come nel Vallo di Adriano, e l'inglese *wall*. Come il vallum delimitava e proteggeva l'accampamento, questo strumento osserva e verifica il perimetro del proprio sistema e della propria rete.

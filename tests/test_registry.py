@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from cybersegugio.core.registry import Param, Registry, RegistryError
+from cybervallum.core.registry import Param, Registry, RegistryError
 
 ENVELOPE_KEYS = {"azione", "stato", "modifica_sistema", "dry_run", "durata_s", "dati", "errore"}
 SUITE_KEYS = {"suite", "stato", "durata_s", "passati", "falliti", "saltati", "dettagli", "errore"}

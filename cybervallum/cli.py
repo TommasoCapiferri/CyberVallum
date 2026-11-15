@@ -1,4 +1,4 @@
-"""Command line interface: `cybersegugio <group> <command>`.
+"""Command line interface: `cybervallum <group> <command>`.
 
 This file contains NO logic: it parses the command line, calls `core.registry`
 (and through it `core.config`) and prints the result, either human-readable
@@ -14,11 +14,11 @@ from typing import Any, Optional
 
 import typer
 
-from cybersegugio import __version__
-from cybersegugio.core import registry
+from cybervallum import __version__
+from cybervallum.core import registry
 
 app = typer.Typer(
-    help="CyberSegugio: sistemistica, sicurezza e controllo della rete.",
+    help="CyberVallum: sistemistica, sicurezza e controllo della rete.",
     no_args_is_help=True,
     add_completion=False,
 )
@@ -74,7 +74,7 @@ def _parse_params(items: list[str]) -> dict[str, str]:
 
 def _version_callback(value: bool) -> None:
     if value:
-        typer.echo(f"cybersegugio {__version__}")
+        typer.echo(f"cybervallum {__version__}")
         raise typer.Exit()
 
 

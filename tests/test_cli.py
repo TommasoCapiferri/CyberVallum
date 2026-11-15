@@ -5,9 +5,9 @@ import json
 import pytest
 from typer.testing import CliRunner
 
-from cybersegugio import cli
-from cybersegugio.core import registry
-from cybersegugio.core.registry import Param
+from cybervallum import cli
+from cybervallum.core import registry
+from cybervallum.core.registry import Param
 
 runner = CliRunner()
 
@@ -22,7 +22,7 @@ def as_json(result):
 
 def test_version():
     result = invoke("--version")
-    assert result.exit_code == 0 and "cybersegugio" in result.stdout
+    assert result.exit_code == 0 and "cybervallum" in result.stdout
 
 
 def test_config_set_get_list_json(isolated_config):

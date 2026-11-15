@@ -1,4 +1,4 @@
-# Istruzioni per Claude Code · CyberSegugio
+# Istruzioni per Claude Code · CyberVallum
 
 **Prima di tutto leggi `PROGETTO.md`**: lì ci sono architettura, regole, roadmap, stato e registro, condivisi con l'AI locale (Cline + Ollama).
 

@@ -2,8 +2,8 @@ import tomllib
 
 import pytest
 
-from cybersegugio.core import config, registry
-from cybersegugio.core.config import ConfigError, Setting
+from cybervallum.core import config, registry
+from cybervallum.core.config import ConfigError, Setting
 
 
 def test_defaults_without_file(isolated_config):
@@ -91,9 +91,9 @@ def test_config_path_per_platform(monkeypatch, tmp_path):
     monkeypatch.setenv("APPDATA", str(tmp_path / "roaming"))
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "xdg"))
     monkeypatch.setattr(config, "_is_windows", lambda: True)
-    assert config.config_path() == tmp_path / "roaming" / "CyberSegugio" / "config.toml"
+    assert config.config_path() == tmp_path / "roaming" / "CyberVallum" / "config.toml"
     monkeypatch.setattr(config, "_is_windows", lambda: False)
-    assert config.config_path() == tmp_path / "xdg" / "cybersegugio" / "config.toml"
+    assert config.config_path() == tmp_path / "xdg" / "cybervallum" / "config.toml"
 
 
 def test_config_actions_go_through_registry():

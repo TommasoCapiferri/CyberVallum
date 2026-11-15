@@ -1,4 +1,4 @@
-"""Settings of CyberSegugio: the ONLY place that reads, validates and saves them.
+"""Settings of CyberVallum: the ONLY place that reads, validates and saves them.
 
 Settings are declared (key `section.name`, type, default, description, validator)
 and stored in `config.toml`. Modules never read files or environment variables on
@@ -6,9 +6,9 @@ their own: they call `get_setting()`. Secrets (API keys, tokens) do NOT live her
 they stay in the `.env` file, which is never committed.
 
 Location of `config.toml`:
-- the path in the CYBERSEGUGIO_CONFIG environment variable, if set;
-- Windows: %APPDATA%\\CyberSegugio\\config.toml
-- Linux:   $XDG_CONFIG_HOME/cybersegugio/config.toml (default ~/.config/...)
+- the path in the CYBERVALLUM_CONFIG environment variable, if set;
+- Windows: %APPDATA%\\CyberVallum\\config.toml
+- Linux:   $XDG_CONFIG_HOME/cybervallum/config.toml (default ~/.config/...)
 """
 
 from __future__ import annotations
@@ -24,10 +24,10 @@ from urllib.parse import urlparse
 
 import tomli_w
 
-from cybersegugio.core import registry
-from cybersegugio.core.convert import ConversionError, to_type, type_name
+from cybervallum.core import registry
+from cybervallum.core.convert import ConversionError, to_type, type_name
 
-ENV_CONFIG_PATH = "CYBERSEGUGIO_CONFIG"
+ENV_CONFIG_PATH = "CYBERVALLUM_CONFIG"
 
 
 class ConfigError(ValueError):
@@ -135,9 +135,9 @@ def config_path() -> Path:
         return Path(override)
     if _is_windows():
         base = Path(os.environ.get("APPDATA") or Path.home() / "AppData" / "Roaming")
-        return base / "CyberSegugio" / "config.toml"
+        return base / "CyberVallum" / "config.toml"
     base = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config")
-    return base / "cybersegugio" / "config.toml"
+    return base / "cybervallum" / "config.toml"
 
 
 def _read_file(path: Path) -> dict[str, Any]:
