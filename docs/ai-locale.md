@@ -109,6 +109,20 @@ Lezioni:
 - **File grandi a pezzi**: si crea prima uno scheletro piccolo con dei segnaposto (`# STEP-2-HERE`), poi ogni funzione si aggiunge sostituendo il segnaposto con `replace_in_file`. Ogni modifica resta sotto il limite dell'editor.
 - **Controllo dopo ogni file**: `.venv\Scripts\python -m py_compile <file>` (senza virgolette, quindi Gemma non lo può rovinare) rivela subito i `\"`.
 
+### Terzo episodio: modulo `converti`, giro 1 rifatto a passi (15/11/2026, riuscito)
+
+Dopo le contromisure (task nuovo, file rotti cancellati, *Auto-approve* al minimo, *Background Exec*, scheletro con segnaposto), Gemma ha completato **9 passi senza nessun file rotto e nessun loop**: commit `c41dae9` (core) e `598a9e6` (test), 82 test superati.
+
+- Passi 1-5 uno alla volta, poi 6-7 e 8-9 a coppie, con un controllo dopo ogni passo (`py_compile` o pytest con il numero di test atteso).
+- Il codice dato per intero (passi 1, 2, 3, 4, 6) è stato copiato correttamente; anche i test descritti solo a parole (passi 7, 8, 9) li ha scritti bene.
+- Restano due difetti, piccoli: **dichiarazioni non verificate** ("esattamente due righe vuote", erano 4 e 3) e **asserzioni deboli** nei test (`assert r["errore"] != ""` passa anche con `None`). Li ha corretti Claude nella revisione, insieme a un caso non coperto dal prompt (`int()` accetta `"1_000"` e `"+5"`).
+
+Cosa ha funzionato e va ripetuto:
+- **Numeri attesi nel prompt** ("attesa: 15 passed"): Gemma e lo sviluppatore verificano a colpo d'occhio.
+- **Una prova che deve fallire** per verificare uno strumento (il `py_compile` su un file inesistente): un controllo che passa sempre non dimostra niente.
+- **Due passi per messaggio** solo se sono dello stesso tipo e con un controllo in mezzo; se un messaggio da due passi va storto, si torna a uno.
+- **Commit di sicurezza** a metà giro (dopo il core, prima dei test).
+
 ### Cosa ha fatto bene
 
 Nel primo episodio, e va riconosciuto: la struttura di `sistema.py` (adattatori, `get_info()`, gestione dei dischi illeggibili) seguiva il prompt; ha capito da sola che `git checkout` era il modo giusto per ripristinare `cli.py`; quando le è stato chiesto ha spiegato i propri errori, anche se in parte con cause inventate.

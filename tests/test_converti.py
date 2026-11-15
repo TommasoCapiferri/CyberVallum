@@ -4,6 +4,7 @@ import pytest
 
 from cybervallum.core import converti, registry
 
+
 @pytest.mark.parametrize("valore, atteso", [
     ("0xFF", {"input": "0xFF", "decimale": 255, "binario": "11111111", "esadecimale": "FF", "bit": 8}),
     ("0", {"input": "0", "decimale": 0, "binario": "0", "esadecimale": "0", "bit": 1}),
@@ -15,21 +16,27 @@ def test_numero_ok(valore, atteso):
     assert converti.numero(valore) == atteso
 
 
-@pytest.mark.parametrize("valore", ["", "-5", "12a", "0xZZ", "0b102"])
+@pytest.mark.parametrize("valore", ["", "-5", "12a", "0xZZ", "0b102", "0x", "+5", "1_000", "0x-5"])
 def test_numero_errore(valore):
     with pytest.raises(ValueError):
         converti.numero(valore)
 
 
 def test_ip_ok():
-    assert converti.ip("192.168.1.10") == {"indirizzo": "192.168.1.10", "intero": 3232235786, "binario": "11000000.10101000.00000001.00001010", "esadecimale": "C0.A8.01.0A", "privato": True}
+    assert converti.ip("192.168.1.10") == {
+        "indirizzo": "192.168.1.10",
+        "intero": 3232235786,
+        "binario": "11000000.10101000.00000001.00001010",
+        "esadecimale": "C0.A8.01.0A",
+        "privato": True,
+    }
 
 
 def test_ip_pubblico():
     assert converti.ip("8.8.8.8")["privato"] is False
 
 
-@pytest.mark.parametrize("indirizzo", ["256.1.1.1", "ciao", "::1"])
+@pytest.mark.parametrize("indirizzo", ["256.1.1.1", "ciao", "::1", "", "1.2.3", "01.2.3.4"])
 def test_ip_errore(indirizzo):
     with pytest.raises(ValueError):
         converti.ip(indirizzo)
@@ -53,13 +60,10 @@ def test_mac_multicast_e_locale():
     assert converti.mac("02:00:00:00:00:01")["amministrato_localmente"] is True
 
 
-@pytest.mark.parametrize("indirizzo", ["00:1A:2B", "GG:00:00:00:00:00"])
+@pytest.mark.parametrize("indirizzo", ["00:1A:2B", "GG:00:00:00:00:00", "", "00:1A:2B:3C:4D:5E:6F"])
 def test_mac_errore(indirizzo):
     with pytest.raises(ValueError):
         converti.mac(indirizzo)
-
-
-
 
 
 def test_registry_ok():
@@ -71,5 +75,5 @@ def test_registry_ok():
 def test_registry_errore():
     r = registry.run("converti.ip", {"indirizzo": "ciao"})
     assert r["stato"] == "errore"
-    assert r["errore"] != ""
+    assert r["errore"]  # not None and not empty (`!= ""` would also accept None)
 

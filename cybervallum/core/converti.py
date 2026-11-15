@@ -11,40 +11,41 @@ from typing import Any
 
 from cybervallum.core import registry
 
+# Digits accepted for each base. Checked explicitly because int() would also
+# accept "+", "_" and other forms that are not valid input for this tool.
+_DIGITS = {2: "01", 10: "0123456789", 16: "0123456789ABCDEF"}
+
+
 def numero(valore: str) -> dict[str, Any]:
+    """Convert a non-negative integer written as 255, 0xFF or 0b1010."""
     text = valore.strip()
     if text.lower().startswith("0x"):
-        base = 16
-        cifre = text[2:]
+        base, cifre = 16, text[2:]
     elif text.lower().startswith("0b"):
-        base = 2
-        cifre = text[2:]
+        base, cifre = 2, text[2:]
     else:
-        base = 10
-        cifre = text
+        base, cifre = 10, text
 
-    if not cifre or cifre.startswith("-"):
+    if not cifre or not all(c in _DIGITS[base] for c in cifre.upper()):
         raise ValueError(f"numero non valido: {valore!r}")
 
-    try:
-        n = int(cifre, base)
-    except ValueError:
-        raise ValueError(f"numero non valido: {valore!r}")
-
+    n = int(cifre, base)
+    binario = format(n, "b")
     return {
         "input": text,
         "decimale": n,
-        "binario": format(n, "b"),
+        "binario": binario,
         "esadecimale": format(n, "X"),
-        "bit": len(format(n, "b"))
+        "bit": len(binario),
     }
 
 
 def ip(indirizzo: str) -> dict[str, Any]:
+    """Show an IPv4 address as an integer, in binary and in hexadecimal."""
     try:
         addr = ipaddress.IPv4Address(indirizzo.strip())
     except ipaddress.AddressValueError:
-        raise ValueError(f"indirizzo IPv4 non valido: {indirizzo!r}")
+        raise ValueError(f"indirizzo IPv4 non valido: {indirizzo!r}") from None
     ottetti = list(addr.packed)
     return {
         "indirizzo": str(addr),
@@ -55,21 +56,19 @@ def ip(indirizzo: str) -> dict[str, Any]:
     }
 
 
-
-
 def mac(indirizzo: str) -> dict[str, Any]:
+    """Normalize a MAC address and read the multicast and locally administered bits."""
     cifre = indirizzo.strip().upper().replace(":", "").replace("-", "").replace(".", "")
-    if len(cifre) != 12 or not all(c in "0123456789ABCDEF" for c in cifre):
+    if len(cifre) != 12 or not all(c in _DIGITS[16] for c in cifre):
         raise ValueError(f"indirizzo MAC non valido: {indirizzo!r}")
     ottetti = [int(cifre[i:i + 2], 16) for i in range(0, 12, 2)]
     return {
         "mac": ":".join(format(o, "02X") for o in ottetti),
         "binario": ":".join(format(o, "08b") for o in ottetti),
         "oui": ":".join(format(o, "02X") for o in ottetti[:3]),
-        "unicast": (ottetti[0] & 1) == 0,
-        "amministrato_localmente": (ottetti[0] & 2) != 0,
+        "unicast": (ottetti[0] & 1) == 0,                   # bit 0 = 1 -> multicast
+        "amministrato_localmente": (ottetti[0] & 2) != 0,   # bit 1 = 1 -> locally administered
     }
-
 
 
 @registry.action("converti.numero", "Converte un numero tra decimale, binario ed esadecimale",

@@ -75,7 +75,7 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 | Modulo | Collegato a | Funzioni | Stato |
 |---|---|---|---|
 | `sistema` | L1 · Come funziona un computer | CPU, core, RAM, dischi, sistema operativo, ultimo avvio | ✅ `sistema info` pronto (15/11) |
-| `converti` | L2 · Binario ed esadecimale | conversioni bin/dec/hex, IP in binario, MAC | ⬜ |
+| `converti` | L2 · Binario ed esadecimale | conversioni bin/dec/hex, IP in binario, MAC | 🔶 core e test pronti (15/11), manca il giro 2 (registro, CLI, docs) |
 | `processi` | L3 · PowerShell: processi | elenco, ordinamento per RAM/CPU, ricerca, chiusura con conferma | ⬜ |
 | `diagnosi` | L4 · Comandi di rete | scala di diagnosi: scheda → IP → gateway → Internet → DNS | ⬜ |
 | `lan` | Fase 1 · Reti | dispositivi della rete di casa (ARP), calcolatore di subnet | ⬜ |
@@ -104,7 +104,8 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 4. ✅ **[claude] Revisione** del modulo `sistema`, fatta insieme al passo 3; README aggiornato (comandi disponibili, `converti` in sviluppo).
 5. **Prima di dare a Gemma il prossimo modulo**, leggere `docs/ai-locale.md` (come lavora l'AI locale, i suoi punti deboli, come scriverle i prompt).
 6. **IMPORTANTE, da fare il 16/11/2026: PowerShell 7 come terminale predefinito.** PowerShell 7.7 è già installato (pacchetto MSIX via winget, comando `pwsh`). Da fare: chiudere e riaprire completamente VS Code, poi Ctrl+Shift+P → *Terminal: Select Default Profile* → la voce con `pwsh.exe` nel percorso (non `powershell.exe`, che è la 5.1). Se non compare, aggiungere un profilo che punta a `C:\Users\tomma\AppData\Local\Microsoft\WindowsApps\pwsh.exe`. Verificare con `$PSVersionTable.PSVersion` (7.7.0). Poi in Cline: *Default Terminal Profile* = PowerShell 7, lasciando *Background Exec*, e rifare la prova dei due `py_compile` (file corretto -> exit code 0, file inesistente -> 1).
-7. **[locale] Modulo `converti`, giro 1 (in corso):** passi 1 (scheletro) e 2 (`numero()`) fatti e verificati; prossimo il passo 3 (`ip()`), poi 4 (`mac()`), poi i test (passi 5-9). Gemma lavora un passo alla volta con i prompt preparati da Claude. Al termine: commit `[locale]`, revisione `[claude]`, poi il giro 2 (registry, CLI, docs/json.md).
+7. ✅ **[locale] Modulo `converti`, giro 1:** `core/converti.py` (`numero`, `ip`, `mac` e le azioni `converti.*`) e `tests/test_converti.py`, scritti da Gemma in 9 passi (commit `c41dae9`, `598a9e6`) e rivisti da Claude.
+8. **[locale] Modulo `converti`, giro 2:** `"cybervallum.core.converti"` in `BUILTIN_MODULES` e suite `converti` in `registry.py`; comandi `vallum converti numero|ip|mac [--json]` in `cli.py`; sezione `dati` di `converti.*` in `docs/json.md`. Prompt a passi preparato da Claude; i commit li fa lo sviluppatore.
 
 ## Registro delle sessioni
 | Data | Chi | Cosa è stato fatto |
@@ -117,3 +118,6 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 | 2026-11-15 | [claude] | Rinomina del progetto in CyberVallum (pacchetto, comandi, configurazione, documentazione) |
 | 2026-11-15 | [locale] | Modulo `sistema`, prima versione: `core/sistema.py` quasi corretto; `registry.py` e `cli.py` rovinati modificandoli con PowerShell; test e documentazione non scritti; mai eseguito pytest |
 | 2026-11-15 | [claude] | Correzione e completamento del modulo `sistema`: registry, CLI con stampa in italiano, adattatori senza logica, `tests/test_sistema.py`, `docs/json.md` |
+| 2026-11-15 | [claude] | Guida all'AI locale e promemoria quotidiano; regole in `.clinerules`; Cline configurato (auto-approve minimo, Background Exec); PowerShell 7 installato |
+| 2026-11-15 | [locale] | Modulo `converti`, giro 1: primo tentativo fallito (file scritti con PowerShell); secondo tentativo riuscito in 9 passi: core e 24 test |
+| 2026-11-15 | [claude] | Revisione di `converti`: cifre ammesse controllate esplicitamente (rifiuta `1_000`, `+5`), `from None`, docstring, formattazione, asserzione più forte, 9 casi di test in più. 91 test superati |
