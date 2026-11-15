@@ -88,9 +88,9 @@ Segnali d'allarme nel diff: `\"` nel codice Python, carattere invisibile `﻿` (
 
 Quando Claude corregge il lavoro di Gemma: prima un commit `[locale]` con il lavoro di Gemma così com'è (anche se non funziona, scritto nel messaggio), poi un commit `[claude]` con le correzioni. Così `git show` mostra separatamente gli errori e la soluzione, utile per imparare.
 
-## Regole proposte per `.clinerules`
+## Regole in `.clinerules`
 
-Da aggiungere se lo sviluppatore è d'accordo, così valgono per ogni attività senza ripeterle nei prompt:
+Aggiunte il 15/11/2026: valgono per ogni attività, senza ripeterle nei prompt (nei prompt lunghi conviene comunque ricordarle):
 
 ```
 - Crea e modifica i file SOLO con gli strumenti dell'editor di Cline, mai con comandi del terminale.

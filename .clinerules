@@ -6,3 +6,11 @@
 - Non eseguire comandi che modificano il sistema senza che l'utente lo chieda esplicitamente.
 - Scansioni e test di rete solo sulla rete di casa e sul laboratorio dell'utente.
 - Alla fine aggiorna la sezione "Stato attuale" e il "Registro delle sessioni" di `PROGETTO.md`. Usa il prefisso `[locale]` nei commit.
+
+## Come modificare i file e usare il terminale (vedi `docs/ai-locale.md`)
+- Crea e modifica i file SOLO con gli strumenti dell'editor di Cline, mai con comandi del terminale.
+- Nei file esistenti fai modifiche piccole con replace_in_file; non riscrivere mai un file intero.
+- Usa il terminale solo per eseguire i test e il programma, non per scrivere file.
+- Se lo stesso comando o la stessa modifica fallisce 2 volte, fermati e mostra l'errore.
+- Non dire che una cosa funziona se non hai mostrato l'output di pytest.
+- Non fare mai git push.
