@@ -1,8 +1,7 @@
-# 🐕 CyberSegugio
+# CyberSegugio
 
-**Il segugio della tua rete.** Uno strumento da terminale e desktop, per Windows e Linux, che fiuta lo stato del PC, la rete e la sicurezza.
-
-> Dedicato a **Titty**, la mia cagnolina, che di fiuto se ne intende. 🐶
+Strumento da riga di comando, con interfaccia desktop in programma, per l'**analisi del sistema**, la **diagnostica di rete** e i **controlli di sicurezza** su Windows e Linux.
+Raccoglie in un unico strumento le verifiche che un sistemista esegue di routine: risorse hardware, processi, connettività, dispositivi in rete, servizi e configurazione di sicurezza.
 
 ## 🧪 Un progetto personale per esercitarmi con l'AI
 CyberSegugio è un **progetto personale di studio**. Lo uso per due cose:
@@ -40,3 +39,6 @@ Le funzioni di analisi della rete vanno usate **solo su reti e sistemi di tua pr
 
 ## Licenza
 [MIT](LICENSE)
+
+---
+*Dedicato a Titty, la mia cagnolina.* 🐶
