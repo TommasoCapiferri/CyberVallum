@@ -1,12 +1,65 @@
 # Lavorare con l'AI locale (Gemma tramite Cline)
 
+La versione breve, da rileggere ogni giorno, è [promemoria-ai-locale.md](promemoria-ai-locale.md).
+
 Questo documento raccoglie come si comporta l'AI locale nel progetto, i suoi punti deboli osservati e il modo di lavorarci che ne deriva. Si aggiorna ogni volta che si scopre un comportamento nuovo. Va letto prima di affidare a Gemma un nuovo modulo.
 
 Configurazione attuale: Cline in VS Code, collegato a Ollama in locale, modello `gemma4:12b-it-qat` con contesto di 64k token (dettagli in `PROGETTO.md`, sezione "Stato attuale").
 
+## Configurazione di Cline e Ollama
+
+### Modalità Plan e Act
+Interruttore **Plan / Act** in basso nel pannello di Cline.
+- **Plan**: sola lettura. Gemma legge, cerca nel codice e fa domande, ma non ha lo strumento `editor`. Se un prompt le chiede di scrivere un file, prova a chiamare strumenti inesistenti (`write_to_file`) e Cline li blocca con `AI_NoSuchToolError`. Serve per farsi spiegare un piano prima di eseguirlo.
+- **Act**: ha anche `editor` e può modificare i file. Si usa per i passi già scritti nel prompt.
+
+### Strumenti disponibili (versione di Cline del 15/11/2026)
+`read_files`, `search_codebase`, `editor`, `run_commands`, `ask_question`, `fetch_web_content` e quattro strumenti `composio_*`.
+- **Composio** è un servizio che collega l'AI ad account esterni (GitHub, Gmail, Slack...). Non è un server MCP installato da noi: lo porta Cline stesso. Il file dei server MCP è vuoto (`"mcpServers": {}`) e nessun account è collegato, quindi oggi non può agire, ma i suoi strumenti restano visibili al modello.
+- `fetch_web_content` scarica pagine web: rischio di *prompt injection* (istruzioni nascoste nel testo di una pagina).
+
+### Approvazione automatica (*Auto-approve*): privilegio minimo
+| Voce nell'interfaccia | Chiave nel file | Valore | Perché |
+|---|---|---|---|
+| Read project files | `readFiles` | on | leggere il progetto non è rischioso |
+| sotto-opzione: Read all files | `readFilesExternally` | **off** | file fuori dal progetto: non servono |
+| Edit project files | `editFiles` | on | nel progetto ogni errore si annulla con git |
+| sotto-opzione: Edit all files | `editFilesExternally` | **off** | fuori dal progetto git non protegge |
+| Execute safe commands | `executeSafeCommands` | **off** | "sicuro" lo decide il modello |
+| sotto-opzione: Execute all commands | `executeAllCommands` | **off** | il permesso più pericoloso |
+| Use browser | `useBrowser` | **off** | pagine web, prompt injection |
+| Use MCP servers | `useMcp` | **off** | qualsiasi strumento esterno |
+
+Impostazioni generali: **Web Search off**. *MCP Display Mode* riguarda solo come vengono mostrati i risultati, non la sicurezza.
+
+**Trappola dell'interfaccia:** le sotto-opzioni ("all files", "all commands") si vedono solo quando la voce principale è spuntata. Togliendo la spunta alla voce principale, la sotto-opzione sparisce dalla vista **ma resta attiva** nel file. Il 15/11/2026 `executeAllCommands` era `true` con la voce principale spenta: per questo Gemma lanciava comandi senza chiedere. Prima si spegne la sotto-opzione, poi la voce principale.
+
+### Dove sono i file di configurazione
+In `C:\Users\tomma\.cline\data\`:
+- `globalState.json`: approvazioni automatiche (`autoApprovalSettings`), modalità corrente, timeout;
+- `settings\global-settings.json`: Web Search (`tools.web_search.enabled`), aggiornamenti automatici, telemetria (`telemetryOptOut`);
+- `settings\cline_mcp_settings.json`: server MCP (vuoto);
+- `settings\providers.json`: provider e modello (contiene credenziali: non va aperto davanti ad altri né condiviso);
+- `sessions\`: la cronologia dei task.
+
+Il file si può modificare a mano (copia di sicurezza: `globalState.json.bak-2026-11-15`), ma Cline tiene le impostazioni in memoria e può riscriverle alla modifica successiva. Dopo un cambio a mano: ricaricare VS Code (*Developer: Reload Window*) e ricontrollare il file.
+
+### Da capire (to-do)
+- [ ] Verificare nell'interfaccia di Cline dove sono esattamente le sotto-opzioni "Read all files", "Edit all files", "Execute all commands", e annotarlo qui.
+- [ ] Controllare dopo un riavvio di VS Code che le modifiche fatte a mano in `globalState.json` siano rimaste.
+- [ ] Capire da dove arrivano gli strumenti `composio_*` e se si possono disattivare del tutto (impostazioni di Cline, account Cline).
+- [ ] Decidere sulla telemetria di Cline: oggi `telemetryOptOut` è `false`, cioè Cline invia dati d'uso. Per un progetto di sicurezza conviene valutare di disattivarla.
+- [ ] Valutare `autoUpdateEnabled`: gli aggiornamenti automatici possono cambiare gli strumenti e i nomi (come `editor` al posto di `write_to_file`) senza preavviso.
+
 ## Come lavora
 
-Cline dà al modello alcuni strumenti: leggere file, modificarli con un editor (`write_to_file` per creare, `replace_in_file` per sostituire un pezzo), eseguire comandi nel terminale (`run_commands`). Il modello sceglie da solo quale strumento usare a ogni passo, legge il risultato e decide il passo successivo.
+Cline dà al modello alcuni strumenti: `read_files` per leggere, `editor` per creare e modificare i file, `run_commands` per eseguire comandi nel terminale. Nei prompt vanno usati questi nomi; `write_to_file` e `replace_in_file` sono di altre versioni di Cline e qui non esistono.
+
+Come funziona `editor` (scoperto il 15/11/2026):
+- **file che non esiste**: basta il testo nuovo e il file viene creato;
+- **file che esiste**: serve anche il testo vecchio esatto da sostituire, e se non corrisponde carattere per carattere (spazi, ritorni a capo, `\"`) la modifica fallisce con "No replacement performed".
+
+Per questo un file rotto non si "riscrive": **lo si cancella** (in VS Code o con `git restore` se era già nel repository) e poi Gemma lo ricrea da zero. Le modifiche a file esistenti devono sostituire pezzi piccoli e unici, come i segnaposto `# STEP-...`. Il modello sceglie da solo quale strumento usare a ogni passo, legge il risultato e decide il passo successivo.
 
 Gemma è un modello da 12 miliardi di parametri: veloce e gratuito, ma molto più piccolo di Claude. In pratica:
 
@@ -78,6 +131,15 @@ Funzionano meglio le istruzioni precise ("aggiungi questa riga qui") delle istru
 ### 2b. Bloccare il terminale in Cline
 
 Nelle impostazioni di Cline (*Auto-approve*), **Execute commands** va tenuto disattivato. Si approva a mano solo `pytest`, `py_compile` e `vallum`; tutto il resto si rifiuta con *Reject* e un messaggio tipo "usa l'editor". È l'unica difesa che funziona davvero: vedi il secondo episodio.
+
+### 2c. Gestire il contesto
+
+La *context window* è la memoria di lavoro del task: istruzioni di sistema di Cline, `.clinerules`, messaggi, file letti, output dei comandi e risposte. In Ollama è impostata a 65.536 token (`OLLAMA_CONTEXT_LENGTH`), e Cline mostra quanto ne è occupato.
+
+- **Un task nuovo per ogni lavoro** (pulsante **+** in Cline), e un task nuovo appena qualcosa va storto: un contesto pieno di tentativi falliti spinge Gemma a ripeterli.
+- **Oltre la metà (circa 32k)** si finisce il passo e si apre un task nuovo. I modelli piccoli seguono peggio le istruzioni iniziali molto prima di arrivare al limite.
+- **Prompt autosufficienti**: invece di "leggi PROGETTO.md e docs/...", conviene mettere nel prompt solo quello che serve al passo. Ogni file letto occupa contesto.
+- Resettare il contesto non cambia i file del progetto: si azzera solo la memoria di Gemma.
 
 ### 3. Controllare i fatti, non il riassunto
 
