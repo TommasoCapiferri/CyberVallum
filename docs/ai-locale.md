@@ -54,7 +54,7 @@ Cline legge output ed exit code dei comandi attraverso la *shell integration* di
 
 ### Da capire (to-do)
 - [x] Exit code sbagliati: risolto con *Background Exec* (vedi sopra).
-- [ ] PowerShell 7.7 è installato (15/11/2026, pacchetto MSIX via winget, comando `pwsh`). Provare, con la stessa prova dei due `py_compile`, il profilo *PowerShell 7* in Cline ed eventualmente come terminale predefinito di VS Code.
+- [ ] **IMPORTANTE (16/11/2026):** PowerShell 7 come terminale predefinito. È già installato (15/11/2026, pacchetto MSIX via winget, comando `pwsh`), ma VS Code non lo elencava perché era aperto da prima dell'installazione: chiuderlo e riaprirlo. Provare, con la stessa prova dei due `py_compile`, il profilo *PowerShell 7* in Cline ed eventualmente come terminale predefinito di VS Code.
 - [ ] Verificare nell'interfaccia di Cline dove sono esattamente le sotto-opzioni "Read all files", "Edit all files", "Execute all commands", e annotarlo qui.
 - [ ] Controllare dopo un riavvio di VS Code che le modifiche fatte a mano in `globalState.json` siano rimaste.
 - [ ] Capire da dove arrivano gli strumenti `composio_*` e se si possono disattivare del tutto (impostazioni di Cline, account Cline).
