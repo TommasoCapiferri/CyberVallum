@@ -31,7 +31,24 @@ Episodio di riferimento: modulo `sistema`, 15/11/2026, commit `acc0728` (version
 | Salta i passi finali | Non ha scritto `tests/test_sistema.py` né la sezione di `docs/json.md` | Modulo senza test e senza contratto JSON |
 | Vuole aggiornare `PROGETTO.md` troppo presto | Stava per segnare il modulo come fatto con il codice ancora rotto | Le note condivise diventerebbero false |
 
-Cosa ha fatto bene, e va riconosciuto: la struttura di `sistema.py` (adattatori, `get_info()`, gestione dei dischi illeggibili) seguiva il prompt; ha capito da sola che `git checkout` era il modo giusto per ripristinare `cli.py`; quando le è stato chiesto ha spiegato i propri errori, anche se in parte con cause inventate.
+### Secondo episodio: modulo `converti`, giro 1 (15/11/2026)
+
+Le regole erano sia nel prompt sia in `.clinerules` ("file solo con l'editor, mai con il terminale"). Gemma le ha ignorate comunque:
+
+- `converti.py` era di circa 6100 caratteri, vicino al limite dell'editor di Cline. Probabilmente è per questo che Gemma è tornata al terminale.
+- Ha lanciato `powershell.exe -Command "python -c \"\"\" ...file intero... \"\"\""`, cioè codice Python dentro tre livelli di virgolette. PowerShell ha chiuso la stringa alla prima virgoletta e poi ha eseguito **ogni riga del file Python come se fosse un comando PowerShell** (`import os` -> "comando non riconosciuto", `@pytest...` -> "operatore di splatting").
+- Risultato: `converti.py` e `test_converti.py` creati con `\"` al posto di `"` e illeggibili da Python. Nessun commit.
+- Ha anche fatto cose fuori dal prompt: test della CLI per un comando che ancora non esiste, e parametri di `parametrize` con nomi diversi da quelli della funzione (`input` invece di `input_str`).
+
+Lezioni:
+
+- **Le regole scritte non bastano**: quando l'editor le sembra scomodo, Gemma torna al terminale. Serve un blocco *tecnico*: in Cline, nelle impostazioni di approvazione automatica (*Auto-approve*), disattivare **Execute commands**. Così ogni comando aspetta il tuo "Approve", e quelli che scrivono file (`python -c`, `Set-Content`, `Out-File`, `echo >`, `powershell.exe -Command`) si rifiutano con *Reject*.
+- **File grandi a pezzi**: si crea prima uno scheletro piccolo con dei segnaposto (`# STEP-2-HERE`), poi ogni funzione si aggiunge sostituendo il segnaposto con `replace_in_file`. Ogni modifica resta sotto il limite dell'editor.
+- **Controllo dopo ogni file**: `.venv\Scripts\python -m py_compile <file>` (senza virgolette, quindi Gemma non lo può rovinare) rivela subito i `\"`.
+
+### Cosa ha fatto bene
+
+Nel primo episodio, e va riconosciuto: la struttura di `sistema.py` (adattatori, `get_info()`, gestione dei dischi illeggibili) seguiva il prompt; ha capito da sola che `git checkout` era il modo giusto per ripristinare `cli.py`; quando le è stato chiesto ha spiegato i propri errori, anche se in parte con cause inventate.
 
 ## Come lavorarci
 
@@ -58,6 +75,10 @@ Regole da mettere in ogni prompt (o in `.clinerules`, vedi sotto):
 
 Funzionano meglio le istruzioni precise ("aggiungi questa riga qui") delle istruzioni di intento ("integra il comando nella CLI"). Il codice da copiare tale e quale (firme, nomi dei campi, fixture dei test) riduce molto gli errori.
 
+### 2b. Bloccare il terminale in Cline
+
+Nelle impostazioni di Cline (*Auto-approve*), **Execute commands** va tenuto disattivato. Si approva a mano solo `pytest`, `py_compile` e `vallum`; tutto il resto si rifiuta con *Reject* e un messaggio tipo "usa l'editor". È l'unica difesa che funziona davvero: vedi il secondo episodio.
+
 ### 3. Controllare i fatti, non il riassunto
 
 Quando Gemma dice di aver finito, prima di crederle:
@@ -67,6 +88,8 @@ git status --short          # quali file ha toccato, file temporanei lasciati in
 git diff                    # cosa ha cambiato davvero
 .venv\Scripts\python -m pytest -q
 ```
+
+Controllo veloce dei file nuovi, che non compaiono in `git diff` finché non si fa `git add`: aprirli in VS Code oppure eseguire `.venv\Scripts\python -m py_compile <file>`.
 
 Segnali d'allarme nel diff: `\"` nel codice Python, carattere invisibile `﻿` (BOM) all'inizio di un file, funzioni duplicate, file `.old` / `.bak` / `.part`, righe vuote sparite fra le funzioni.
 
