@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Segreti
+.env
+*.key
+*.pem
+
+# Catture di rete e output con dati della propria rete
+*.pcap
+*.pcapng
+output/
+
+# Editor e sistema
+.vscode/settings.json
+Thumbs.db
+desktop.ini

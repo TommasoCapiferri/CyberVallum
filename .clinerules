@@ -1,0 +1,8 @@
+# Regole per Cline (AI locale) · CyberSegugio
+
+- All'inizio di ogni attività leggi `PROGETTO.md`: architettura, regole del codice, roadmap e stato del progetto. Segui quelle regole.
+- Rispondi in italiano. Codice e commenti in inglese.
+- Fai una cosa alla volta e mostra le modifiche prima di applicarle.
+- Non eseguire comandi che modificano il sistema senza che l'utente lo chieda esplicitamente.
+- Scansioni e test di rete solo sulla rete di casa e sul laboratorio dell'utente.
+- Alla fine aggiorna la sezione "Stato attuale" e il "Registro delle sessioni" di `PROGETTO.md`. Usa il prefisso `[locale]` nei commit.
