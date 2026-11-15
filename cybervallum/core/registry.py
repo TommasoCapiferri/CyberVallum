@@ -28,7 +28,7 @@ from cybervallum.core.convert import ConversionError, to_type, type_name
 # Core modules that register actions on import. New modules are added here.
 BUILTIN_MODULES: list[str] = [
     "cybervallum.core.config",
-    \"cybervallum.core.sistema\",
+    "cybervallum.core.sistema",
 ]
 
 # Project root (the folder that contains `cybervallum/` and `tests/`).
@@ -298,7 +298,7 @@ default_registry.add_suite("tutti", "Tutti i test del progetto", ["tests"])
 default_registry.add_suite("config", "Test delle impostazioni", ["tests/test_config.py"])
 default_registry.add_suite("registry", "Test del registro", ["tests/test_registry.py"])
 default_registry.add_suite("cli", "Test della riga di comando", ["tests/test_cli.py"])
-    default_registry.add_suite(\"sistema\", \"Test del modulo sistema\", [\"tests/test_sistema.py\"])
+default_registry.add_suite("sistema", "Test del modulo sistema", ["tests/test_sistema.py"])
 
 action = default_registry.action
 add_suite = default_registry.add_suite

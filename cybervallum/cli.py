@@ -25,9 +25,11 @@ app = typer.Typer(
 config_app = typer.Typer(help="Impostazioni (config.toml).", no_args_is_help=True)
 check_app = typer.Typer(help="Controlli registrati: elenco ed esecuzione.", no_args_is_help=True)
 test_app = typer.Typer(help="Suite di test: elenco ed esecuzione.", no_args_is_help=True)
+sistema_app = typer.Typer(help="Informazioni sul sistema.", no_args_is_help=True)
 app.add_typer(config_app, name="config")
 app.add_typer(check_app, name="check")
 app.add_typer(test_app, name="test")
+app.add_typer(sistema_app, name="sistema")
 
 JsonOpt = typer.Option(False, "--json", help="Output in JSON stabile (vedi docs/json.md).")
 
@@ -160,11 +162,37 @@ def check_run(
     _finish(registry.run(nome, params, dry_run=dry_run, conferma=conferma), as_json)
 
 
-# --- sistema ---
+# --- sistema ------------------------------------------------------------------------
+
+def _nd(value: Any) -> str:
+    """Show None as "n/d" (non disponibile)."""
+    return "n/d" if value is None else str(value)
+
+
+def _gb(n_bytes: int) -> str:
+    return f"{n_bytes / 1024**3:.1f}"
+
+
+def _print_sistema(dati: dict[str, Any]) -> None:
+    so, cpu, mem, avvio = dati["sistema_operativo"], dati["cpu"], dati["memoria"], dati["avvio"]
+    typer.echo(f"Sistema operativo: {_nd(so['nome'])} {_nd(so['release'])} "
+               f"({_nd(so['architettura'])}), host {_nd(so['nome_host'])}")
+    freq = "n/d" if cpu["frequenza_mhz"] is None else f"{cpu['frequenza_mhz']:.0f}"
+    typer.echo(f"CPU: {_nd(cpu['modello'])}, {_nd(cpu['core_fisici'])} core fisici / "
+               f"{_nd(cpu['core_logici'])} logici, {freq} MHz, uso {cpu['uso_percentuale']}%")
+    typer.echo(f"Memoria: {_gb(mem['disponibile_byte'])} GB disponibili su {_gb(mem['totale_byte'])} GB "
+               f"(usata {mem['usata_percentuale']}%)")
+    for d in dati["dischi"]:
+        typer.echo(f"Disco {d['dispositivo']} ({_nd(d['filesystem'])}): {_gb(d['libero_byte'])} GB liberi "
+                   f"su {_gb(d['totale_byte'])} GB (usato {d['usato_percentuale']}%)")
+    ore, resto = divmod(avvio["uptime_s"], 3600)
+    typer.echo(f"Ultimo avvio: {avvio['ultimo_avvio']} (attivo da {ore} h {resto // 60} min)")
+
+
 @sistema_app.command("info")
 def sistema_info(as_json: bool = JsonOpt) -> None:
     """Mostra CPU, memoria, dischi, sistema operativo e ultimo avvio."""
-    _finish(registry.run("sistema.info"), as_json, _print_json)
+    _finish(registry.run("sistema.info"), as_json, _print_sistema)
 
 
 # --- test ---------------------------------------------------------------------------

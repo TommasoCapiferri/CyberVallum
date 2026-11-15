@@ -74,7 +74,7 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 ## Roadmap (collegata al percorso di studio)
 | Modulo | Collegato a | Funzioni | Stato |
 |---|---|---|---|
-| `sistema` | L1 · Come funziona un computer | CPU, core, RAM, dischi, sistema operativo, ultimo avvio | ⬜ da fare (primo modulo) |
+| `sistema` | L1 · Come funziona un computer | CPU, core, RAM, dischi, sistema operativo, ultimo avvio | ✅ `sistema info` pronto (15/11) |
 | `converti` | L2 · Binario ed esadecimale | conversioni bin/dec/hex, IP in binario, MAC | ⬜ |
 | `processi` | L3 · PowerShell: processi | elenco, ordinamento per RAM/CPU, ricerca, chiusura con conferma | ⬜ |
 | `diagnosi` | L4 · Comandi di rete | scala di diagnosi: scheda → IP → gateway → Internet → DNS | ⬜ |
@@ -93,14 +93,16 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 - 2026-11-15: progetto creato.
 - 2026-11-15: **progetto rinominato da CyberSegugio a CyberVallum**: pacchetto `cybervallum`, comandi `cybervallum` e `vallum` (equivalenti), variabile `CYBERVALLUM_CONFIG`, impostazioni in `%APPDATA%\CyberVallum\`.
 - 2026-11-15: **base del codice pronta** (passo 1): `pyproject.toml`, `core/convert.py`, `core/config.py` (impostazioni validate in `config.toml`; host dell'API solo loopback, fonti solo HTTPS), `core/registry.py` (azioni `<modulo>.<azione>`, dry-run e conferma per `modifica_sistema`, suite pytest con esito JSON), `cli.py` (`config list|get|set`, `check list|run`, `test list|run`, tutti con `--json`), `docs/json.md`. 49 test superati.
+- 2026-11-15: **modulo `sistema` pronto** (passo 3): `core/sistema.py` (adattatori di psutil/platform sostituiti nei test, azione `sistema.info` in sola lettura), comando `vallum sistema info [--json]`, suite `sistema`, formato in `docs/json.md`. 58 test superati. La prima versione di Gemma (commit `[locale]`) non funzionava: corretta da Claude nel commit `[claude]` successivo. Miglioramenti possibili: nome commerciale della CPU su Windows, `ultimo_avvio` senza microsecondi.
 - Git 2.56 e GitHub CLI installati. Repository pubblico: https://github.com/TommasoCapiferri/CyberVallum (ramo `main`). Dopo ogni commit: `git push`.
 - AI locale: Ollama 0.40.16, in ascolto solo su 127.0.0.1. Modello **`gemma4:12b-it-qat`** (7,2 GB) scaricato il 15/11: gira al 100% sulla GPU RTX 5070 a circa 68-71 token/s anche con contesto da 64k (7,7 GB occupati). Contesto predefinito impostato con `OLLAMA_CONTEXT_LENGTH=65536` (variabile d'ambiente dell'utente). Cline installato in VS Code e collegato a Ollama (provider Ollama, modello `gemma4:12b-it-qat`, contesto 65536, timeout 300000 ms); prima prova superata il 15/11 (Gemma riassume correttamente progetto, primo modulo, regole dei test e dei commit; trascura i mock e `--json`).
 
 ## Prossimi passi
 1. ✅ **[claude] Base del progetto:** `pyproject.toml` (Python 3.12, dipendenze `psutil`, `typer`, `pytest`), pacchetto `cybervallum/` con `core/config.py` (impostazioni in `config.toml`, validazione, `list/get/set`), `core/registry.py` (registrazione delle azioni `<modulo>.<azione>` con parametri e flag `modifica_sistema`, avvio unico che restituisce un dizionario), `cli.py` con i comandi `config`, `check list`, `check run … --json`, `test run … --json`; cartella `tests/` con i test di config e registry. Commit `[claude]`.
 2. **[claude] Istruzioni per Cline:** un prompt pronto da incollare per il modulo `sistema`: funzioni del core dietro piccoli adattatori di `psutil`/`platform` sostituibili nei test, registrazione nel registro, comando `cybervallum sistema info --json`, test con mock. Ricordare a Gemma mock e `--json`, che nel riassunto aveva trascurato.
-3. **[locale] Modulo `sistema`:** lo scrive Cline con Gemma seguendo il prompt; commit `[locale]`.
-4. **[claude] Revisione** del modulo `sistema`, aggiornamento del README ("Cosa può fare oggi") e della roadmap.
+3. ✅ **[locale] Modulo `sistema`:** scritto da Gemma, non funzionante (commit `[locale]` acc0728); corretto e completato da Claude (commit `[claude]`).
+4. **[claude] Revisione** del modulo `sistema`: ✅ fatta insieme al passo 3. Resta l'aggiornamento del README ("Cosa può fare oggi"), da mostrare allo sviluppatore prima del commit.
+5. **Prima di dare a Gemma il prossimo modulo**, leggere `docs/ai-locale.md` (come lavora l'AI locale, i suoi punti deboli, come scriverle i prompt).
 
 ## Registro delle sessioni
 | Data | Chi | Cosa è stato fatto |
@@ -111,3 +113,5 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 | 2026-11-15 | [claude] | Regola 10: impostazioni, controlli e test comandabili da CLI e API; moduli `config` e `api` nella roadmap; regola 11 e modulo `aggiornamenti` (dati di sicurezza scaricati e verificati) |
 | 2026-11-15 | [claude] | Passo 1: base del codice (config, registry, CLI con `--json`, test, docs/json.md) |
 | 2026-11-15 | [claude] | Rinomina del progetto in CyberVallum (pacchetto, comandi, configurazione, documentazione) |
+| 2026-11-15 | [locale] | Modulo `sistema`, prima versione: `core/sistema.py` quasi corretto; `registry.py` e `cli.py` rovinati modificandoli con PowerShell; test e documentazione non scritti; mai eseguito pytest |
+| 2026-11-15 | [claude] | Correzione e completamento del modulo `sistema`: registry, CLI con stampa in italiano, adattatori senza logica, `tests/test_sistema.py`, `docs/json.md` |
