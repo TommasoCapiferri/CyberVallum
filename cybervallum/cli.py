@@ -160,6 +160,13 @@ def check_run(
     _finish(registry.run(nome, params, dry_run=dry_run, conferma=conferma), as_json)
 
 
+# --- sistema ---
+@sistema_app.command("info")
+def sistema_info(as_json: bool = JsonOpt) -> None:
+    """Mostra CPU, memoria, dischi, sistema operativo e ultimo avvio."""
+    _finish(registry.run("sistema.info"), as_json, _print_json)
+
+
 # --- test ---------------------------------------------------------------------------
 
 @test_app.command("list")
