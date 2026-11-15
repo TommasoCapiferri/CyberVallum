@@ -197,6 +197,28 @@ def sistema_info(as_json: bool = JsonOpt) -> None:
     _finish(registry.run("sistema.info"), as_json, _print_sistema)
 
 
+# --- converti -----------------------------------------------------------------------
+
+def _print_numero(dati: dict[str, Any]) -> None:
+    typer.echo(f"Decimale: {dati['decimale']}")
+    typer.echo(f"Binario: {dati['binario']} ({dati['bit']} bit)")
+    typer.echo(f"Esadecimale: {dati['esadecimale']}")
+
+
+@converti_app.command("numero")
+def converti_numero(
+    valore: str = typer.Argument(..., help="Numero: 255, 0xFF o 0b1010"),
+    as_json: bool = JsonOpt,
+) -> None:
+    """Converte un numero tra decimale, binario ed esadecimale."""
+    _finish(registry.run("converti.numero", {"valore": valore}), as_json, _print_numero)
+
+
+# STEP-4-IP
+
+# STEP-5-MAC
+
+
 # --- test ---------------------------------------------------------------------------
 
 @test_app.command("list")
