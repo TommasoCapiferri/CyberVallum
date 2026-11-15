@@ -54,7 +54,8 @@ Cline legge output ed exit code dei comandi attraverso la *shell integration* di
 
 ### Da capire (to-do)
 - [x] Exit code sbagliati: risolto con *Background Exec* (vedi sopra).
-- [ ] **IMPORTANTE (16/11/2026):** PowerShell 7 come terminale predefinito. È già installato (15/11/2026, pacchetto MSIX via winget, comando `pwsh`), ma VS Code non lo elencava perché era aperto da prima dell'installazione: chiuderlo e riaprirlo. Provare, con la stessa prova dei due `py_compile`, il profilo *PowerShell 7* in Cline ed eventualmente come terminale predefinito di VS Code.
+- [x] **Fatto il 16/11/2026:** PowerShell 7.7.0 è il terminale predefinito di VS Code (verificato con `$PSVersionTable.PSVersion`). Resta da provare il profilo *PowerShell 7* anche in Cline.
+- (storico) PowerShell 7 come terminale predefinito. È già installato (15/11/2026, pacchetto MSIX via winget, comando `pwsh`), ma VS Code non lo elencava perché era aperto da prima dell'installazione: chiuderlo e riaprirlo. Provare, con la stessa prova dei due `py_compile`, il profilo *PowerShell 7* in Cline ed eventualmente come terminale predefinito di VS Code.
 - [ ] Verificare nell'interfaccia di Cline dove sono esattamente le sotto-opzioni "Read all files", "Edit all files", "Execute all commands", e annotarlo qui.
 - [ ] Controllare dopo un riavvio di VS Code che le modifiche fatte a mano in `globalState.json` siano rimaste.
 - [ ] Capire da dove arrivano gli strumenti `composio_*` e se si possono disattivare del tutto (impostazioni di Cline, account Cline).
@@ -122,6 +123,11 @@ Cosa ha funzionato e va ripetuto:
 - **Una prova che deve fallire** per verificare uno strumento (il `py_compile` su un file inesistente): un controllo che passa sempre non dimostra niente.
 - **Due passi per messaggio** solo se sono dello stesso tipo e con un controllo in mezzo; se un messaggio da due passi va storto, si torna a uno.
 - **Commit di sicurezza** a metà giro (dopo il core, prima dei test).
+
+### Quarto episodio: `converti`, giro 2 (16/11/2026)
+
+- Passi 1-2 (modifiche a `registry.py` e `cli.py`, file esistenti): corretti al primo colpo con il formato "TESTO VECCHIO = una riga corta e unica / TESTO NUOVO = la stessa riga più le aggiunte".
+- Aggiunta non richiesta: una riga nel registro di `PROGETTO.md` ("Modulo converti collegato al registro e alla CLI"), **falsa** (i comandi CLI non esistevano ancora), con data sbagliata ed emoji. Causa: `.clinerules` diceva "alla fine aggiorna PROGETTO.md", in contrasto con il prompt. **Lezione: le regole permanenti e i prompt non devono contraddirsi**; `.clinerules` ora dice che `PROGETTO.md` lo aggiorna Claude e che, in caso di conflitto, vale il prompt.
 
 ### Cosa ha fatto bene
 
