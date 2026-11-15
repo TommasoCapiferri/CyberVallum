@@ -192,6 +192,20 @@ Segnali d'allarme nel diff: `\"` nel codice Python, carattere invisibile `﻿` (
 - Poi un messaggio che dice **cosa è stato ripristinato, cosa resta valido e da dove ripartire**, con le regole del punto 2.
 - Se dopo un secondo tentativo è ancora incastrata, conviene passare il lavoro a Claude.
 
+### 4b. Costo e modo di lavorare con Claude
+
+I token di Gemma sono gratuiti (girano sulla GPU), ma **non riducono quelli di Claude**: con prompt che contengono il codice completo, una verifica di Claude a ogni passo e una conversazione lunga, Claude consuma più che a scrivere il modulo da solo. Per `converti`, il 15-16/11/2026, il costo è stato più alto.
+
+Scelta dello sviluppatore (16/11/2026): **per ora conta imparare, non risparmiare**. Si lavora verificando insieme gli output a ogni passo e migliorando insieme il modo di usare l'AI locale.
+
+Quando servirà risparmiare:
+- prompt di **specifica** (firma, esempi, errori, test attesi) invece che di codice;
+- controlli intermedi fatti dallo sviluppatore con i risultati attesi scritti nel prompt; Claude solo a fine giro;
+- **una sessione di Claude nuova per ogni lavoro**: in una conversazione lunga ogni turno rilegge tutto il contesto;
+- a Gemma i lavori con specifica corta e codice lungo o ripetitivo.
+
+I prompt pronti si salvano in `docs/prompts/`, così sopravvivono alla fine della sessione di Claude e restano come esempio.
+
 ### 5. Dividere il lavoro fra le due AI
 
 | Gemma (locale, gratis) | Claude Code (abbonamento, con limiti) |
