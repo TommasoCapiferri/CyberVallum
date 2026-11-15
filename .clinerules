@@ -13,5 +13,11 @@
 - Nei file esistenti fai modifiche piccole con replace_in_file; non riscrivere mai un file intero.
 - Usa il terminale solo per eseguire i test e il programma, non per scrivere file.
 - Se lo stesso comando o la stessa modifica fallisce 2 volte, fermati e mostra l'errore.
+- Regola anti-loop: prima di ogni chiamata a uno strumento confrontala con le tue chiamate precedenti. Se stai per rifare la STESSA chiamata (stesso strumento, stesso file, stesso testo) per la terza volta, anche se le volte prima era riuscita, NON farla: fermati e scrivi cosa hai fatto, cosa vedi e cosa ti aspettavi.
+- Una modifica riuscita non si ripete. Dopo un replace_in_file riuscito rileggi il file UNA volta e passa ai controlli del prompt.
+- Se l'editor dice che il testo da sostituire non è unico o non esiste, FERMATI e dillo: non allargare la ricerca e non scegliere tu quale copia modificare.
+- Non rifare passi che il prompt dice già fatti. Se trovi già nel file il codice che dovresti aggiungere, FERMATI e chiedi.
+- Se ti accorgi che il tuo ragionamento ripete le stesse frasi o gli stessi piani, fermati e chiedi all'utente.
 - Non dire che una cosa funziona se non hai mostrato l'output di pytest.
+- Dopo ogni modifica esegui `.venv\Scripts\python scripts\verifica.py` (con `--con-segnaposto` solo se il prompt lo dice). Hai finito solo quando stampa `VERIFICA: OK`. Se segnala un errore, correggi SOLO quello; se lo stesso errore compare 2 volte, fermati e mostrami l'output.
 - Non fare mai git push.

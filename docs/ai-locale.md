@@ -185,6 +185,34 @@ Controllo veloce dei file nuovi, che non compaiono in `git diff` finché non si 
 
 Segnali d'allarme nel diff: `\"` nel codice Python, carattere invisibile `﻿` (BOM) all'inizio di un file, funzioni duplicate, file `.old` / `.bak` / `.part`, righe vuote sparite fra le funzioni.
 
+### 3b. Loop senza errori: `converti`, giro 2, messaggio C (16/11/2026)
+
+Il messaggio C cominciava con "PASSO 3 verificato", ma era incollato in un **task nuovo** di Cline, senza la conversazione dei messaggi A e B. Gemma l'ha letto come un ordine e ha **rifatto il passo 3**, pur notando che il codice "era già presente". Poi `# STEP-4-IP` non era più unico (i doppioni li aveva creati lei), ne ha dato la colpa a "modifiche precedenti" e ha pianificato di allargare il testo da cercare. Alla domanda "sei andata in loop?" ha risposto "No". In tutto, invece di scrivere `ip` e `mac`, Gemma ha incollato **due volte** in fondo a `cli.py` il blocco `converti` già esistente (`_print_numero`, `converti_numero` e i segnaposto), lasciando 3 copie di `# STEP-4-IP` e `# STEP-5-MAC`. Ogni `replace_in_file` era **riuscito**: la regola "se fallisce 2 volte, fermati" non scattava. Inoltre `py_compile` passava (in Python ridefinire una funzione è lecito) e pytest restava a 91. Lo rivelava solo `vallum converti ip` ("No such command 'ip'").
+
+Lezioni:
+- la regola anti-loop deve contare le **ripetizioni**, non solo i fallimenti (aggiunta in `.clinerules`);
+- nei controlli del prompt servono verifiche sul **risultato** (il comando esiste, una funzione compare una sola volta), non solo sulla sintassi;
+- una modifica riuscita non va ripetuta: rileggere il file una volta e passare ai controlli;
+- **ogni messaggio per un task nuovo deve stare in piedi da solo**: dire cosa è già fatto, cosa non toccare, e far controllare lo stato del file prima di iniziare;
+- "testo non unico" è un segnale di stop, non un problema da aggirare.
+
+Esito del messaggio C riscritto (autosufficiente): passi 4 e 5 corretti al primo colpo. Il passo 5 Gemma l'ha **scritto da sola** dalla descrizione e dall'esempio del passo 4; unico difetto, 3 righe vuote invece di 2.
+
+### 3c. Il verificatore: `scripts\verifica.py` (16/11/2026)
+
+Il punto debole di Gemma è **giudicare il proprio lavoro** (dichiara "fatto" o "non sono in loop" contro i fatti). Per renderla più autonoma il giudizio lo dà un programma:
+
+```
+.venv\Scripts\python scripts\verifica.py                  # tutto
+.venv\Scripts\python scripts\verifica.py --con-segnaposto # lavoro a metà, "# STEP-" ammessi
+```
+
+Controlla: **ruff** (nomi non definiti F821, funzioni duplicate F811, import inutili, errori di sintassi, righe vuote fra le funzioni E30), segnaposto `# STEP-` rimasti, file `.old`/`.bak`/`.part`, BOM, pytest. Stampa `VERIFICA: OK` (exit 0) o `VERIFICA: FALLITA` con l'elenco (exit 1). Le regole di ruff sono poche di proposito (in `pyproject.toml`): solo errori veri, niente stile, perché ogni segnalazione superflua è un'occasione di loop.
+
+Avrebbe scoperto da solo: i doppioni del messaggio C, `sistema_app` mai creato nel modulo `sistema`, le righe vuote in più. Regola in `.clinerules`: hai finito solo con `VERIFICA: OK`; stesso errore 2 volte, fermati. Ruff si installa con `.venv\Scripts\python -m pip install -e .[dev]`.
+
+Prossimi gradini di autonomia: (1) codice da copiare, (2) descrizione con esempio (passo 5 di `converti`), (3) solo firme, campi JSON e risultati attesi (modulo `processi`), (4) solo obiettivo e controlli, con piano in modalità Plan rivisto da Claude. Da provare per ultimo: una variante del modello con `temperature` più bassa (ora è 1), confrontata sullo stesso passo.
+
 ### 4. Quando si incastra
 
 - **Fermarla subito** al primo loop: lasciarla riprovare peggiora i file.

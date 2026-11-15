@@ -25,3 +25,18 @@ include = ["cybervallum*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.6"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+# Only rules that catch real mistakes (see docs/ai-locale.md):
+# F = undefined names, duplicate definitions, unused imports; E4/E7/E9 = syntax and import errors;
+# E30 = blank lines between functions (too many or too few).
+select = ["F", "E4", "E7", "E9", "E30"]
+preview = true
+explicit-preview-rules = false

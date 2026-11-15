@@ -35,7 +35,7 @@ Il nome viene dal latino *vallum*, il terrapieno difensivo degli accampamenti ro
 5. Si scrive `tests/test_<modulo>.py` con i mock e si documenta il formato di `dati` in `docs/json.md`.
 6. Per eventuali impostazioni del modulo si usa `config.register_setting(Setting(...))`. Mai leggere file o variabili d'ambiente direttamente.
 
-**Ambiente di sviluppo:** `py -3.12 -m venv .venv`, poi `.venv\Scripts\python -m pip install -e .` e `.venv\Scripts\python -m pytest`. Il formato `--json` è documentato in `docs/json.md`.
+**Ambiente di sviluppo:** `py -3.12 -m venv .venv`, poi `.venv\Scripts\python -m pip install -e .[dev]` e `.venv\Scripts\python -m pytest`. **Verifica completa** (ruff, segnaposto, file di copia, BOM, pytest): `.venv\Scripts\python scripts\verifica.py`, che deve stampare `VERIFICA: OK` prima di ogni commit. Il formato `--json` è documentato in `docs/json.md`.
 
 ## Il README
 Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **Cosa può fare oggi** (moduli funzionanti), **In sviluppo** (il modulo su cui si sta lavorando) e **Obiettivi** (moduli futuri). Deve restare chiaro che è un **progetto personale per esercitarsi con l'AI**.
@@ -105,7 +105,7 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 5. **Prima di dare a Gemma il prossimo modulo**, leggere `docs/ai-locale.md` (come lavora l'AI locale, i suoi punti deboli, come scriverle i prompt).
 6. ✅ **PowerShell 7.7 terminale predefinito di VS Code** (16/11/2026). Note originali: PowerShell 7.7 è già installato (pacchetto MSIX via winget, comando `pwsh`). Da fare: chiudere e riaprire completamente VS Code, poi Ctrl+Shift+P → *Terminal: Select Default Profile* → la voce con `pwsh.exe` nel percorso (non `powershell.exe`, che è la 5.1). Se non compare, aggiungere un profilo che punta a `C:\Users\tomma\AppData\Local\Microsoft\WindowsApps\pwsh.exe`. Verificare con `$PSVersionTable.PSVersion` (7.7.0). Poi in Cline: *Default Terminal Profile* = PowerShell 7, lasciando *Background Exec*, e rifare la prova dei due `py_compile` (file corretto -> exit code 0, file inesistente -> 1).
 7. ✅ **[locale] Modulo `converti`, giro 1:** `core/converti.py` (`numero`, `ip`, `mac` e le azioni `converti.*`) e `tests/test_converti.py`, scritti da Gemma in 9 passi (commit `c41dae9`, `598a9e6`) e rivisti da Claude.
-8. **[locale] Modulo `converti`, giro 2 (in corso):** `"cybervallum.core.converti"` in `BUILTIN_MODULES` e suite `converti` in `registry.py`; comandi `vallum converti numero|ip|mac [--json]` in `cli.py`; sezione `dati` di `converti.*` in `docs/json.md`. **Fatti e verificati i passi 1-3** (registro, gruppo CLI, comando `numero`; 91 test). **Prossimo: messaggio C** (passi 4-5, comandi `ip` e `mac`), poi D (test CLI, 96 attesi) ed E (docs). I prompt pronti sono in `docs/prompts/converti-giro2.md`. Commit e push li fa Claude.
+8. **[locale] Modulo `converti`, giro 2 (in corso):** `"cybervallum.core.converti"` in `BUILTIN_MODULES` e suite `converti` in `registry.py`; comandi `vallum converti numero|ip|mac [--json]` in `cli.py`; sezione `dati` di `converti.*` in `docs/json.md`. **Fatti e verificati i passi 1-5** (registro, gruppo CLI, comandi `numero`, `ip`, `mac`; 91 test). **Prossimo: messaggio D** (test CLI, 96 attesi), poi E (docs), nello stesso task di Cline. I prompt pronti sono in `docs/prompts/converti-giro2.md`. Commit e push li fa Claude.
 9. **[claude] Revisione del giro 2** e aggiornamento del README (comandi `converti` tra le funzionalità disponibili).
 
 ## Registro delle sessioni
@@ -122,3 +122,6 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 | 2026-11-15 | [claude] | Guida all'AI locale e promemoria quotidiano; regole in `.clinerules`; Cline configurato (auto-approve minimo, Background Exec); PowerShell 7 installato |
 | 2026-11-15 | [locale] | Modulo `converti`, giro 1: primo tentativo fallito (file scritti con PowerShell); secondo tentativo riuscito in 9 passi: core e 24 test |
 | 2026-11-15 | [claude] | Revisione di `converti`: cifre ammesse controllate esplicitamente (rifiuta `1_000`, `+5`), `from None`, docstring, formattazione, asserzione più forte, 9 casi di test in più. 91 test superati |
+| 2026-11-16 | [locale] | `converti`, giro 2: passi 1-3 (registro, gruppo CLI, comando `numero`) |
+| 2026-11-16 | [locale] | `converti`, giro 2, passi 4-5: primo tentativo in loop (messaggio senza contesto in un task nuovo: ha rifatto il passo 3 e duplicato il codice; annullato). Secondo tentativo corretto; il comando `mac` scritto da sola dalla descrizione |
+| 2026-11-16 | [claude] | Regole anti-loop in `.clinerules`; messaggi per Gemma autosufficienti; `scripts/verifica.py` (ruff con regole minime, segnaposto, file di copia, BOM, pytest) come giudice automatico per Gemma |

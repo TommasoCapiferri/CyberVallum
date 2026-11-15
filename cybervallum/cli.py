@@ -249,7 +249,6 @@ def converti_mac(
     _finish(registry.run("converti.mac", {"indirizzo": indirizzo}), as_json, _print_mac)
 
 
-
 # --- test ---------------------------------------------------------------------------
 
 @test_app.command("list")

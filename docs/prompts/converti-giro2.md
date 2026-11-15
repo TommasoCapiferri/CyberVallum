@@ -2,14 +2,17 @@
 
 Prompt preparati da Claude il 16/11/2026 e provati prima su una copia del progetto (96 test superati alla fine). Si incollano in Cline, modalità **Act**, uno alla volta; dopo ogni messaggio si controlla che i risultati corrispondano a quelli attesi.
 
-Stato: messaggi A (passi 1-2) e B (passo 3) **fatti** (commit `54c9f6c` e successivo). Restano C, D, E.
+Stato: messaggi A (passi 1-2), B (passo 3) e C (passi 4-5, commit `eadee4a`) **fatti**. Restano D ed E. Dal messaggio D i controlli usano anche `scripts\verifica.py`.
 
 Come sono scritti (vedi [../ai-locale.md](../ai-locale.md)): ogni modifica a un file esistente è "TESTO VECCHIO = una riga corta e unica, TESTO NUOVO = la stessa riga più le aggiunte"; i segnaposto `# STEP-...` rendono unico il punto da sostituire; ogni passo ha controlli con il risultato atteso.
 
 ## Messaggio C (passi 4 e 5)
 
 ```text
-PASSO 3 verificato. Ora DUE passi dello stesso tipo. Stesse regole: controllo dopo ciascuno, se fallisce FERMATI.
+CONTESTO: stiamo completando il modulo converti. I passi 1, 2 e 3 sono GIÀ FATTI e verificati: in cybervallum\cli.py esistono già converti_app, _print_numero e il comando "numero". NON rifarli e non toccare quel codice.
+Prima di iniziare leggi cybervallum\cli.py con read_files e verifica che le righe "# STEP-4-IP" e "# STEP-5-MAC" compaiano UNA volta ciascuna. Se no, FERMATI e dimmelo senza modificare nulla.
+
+Ora DUE passi. Regole: controllo dopo ciascuno; se un controllo fallisce FERMATI; se l'editor dice che il testo da sostituire non è unico o non esiste, FERMATI (non allargare la ricerca e non scegliere tu quale copia modificare).
 
 PASSO 4. File cybervallum\cli.py: sostituisci SOLO la riga "# STEP-4-IP" con:
 
@@ -47,7 +50,8 @@ Controllo del passo 5:
 - .venv\Scripts\vallum converti mac 02-00-00-00-00-01   (atteso: ultima riga "Tipo: unicast, amministrato localmente")
 - .venv\Scripts\vallum converti ip ciao   (atteso: "ERRORE: indirizzo IPv4 non valido: 'ciao'" ed exit code 1: è un errore VOLUTO, va bene così)
 - .venv\Scripts\python -m pytest -q   (atteso: 91 passed)
-Poi rileggi cli.py con read_files e verifica che non ci siano righe "# STEP-".
+Poi rileggi cli.py con read_files e verifica che: non ci siano righe "# STEP-"; "def converti_numero" compaia UNA sola volta; "def converti_ip" e "def converti_mac" compaiano una volta ciascuna.
+Se una modifica è riuscita non ripeterla. Se stai per rifare la stessa modifica per la terza volta, FERMATI.
 
 Riportami exit code e output di ogni controllo, poi FERMATI.
 ```
@@ -55,7 +59,9 @@ Riportami exit code e output di ogni controllo, poi FERMATI.
 ## Messaggio D (passo 6)
 
 ```text
-PASSI 4 e 5 verificati. Ora i test della CLI. Stesse regole. Modifica SOLO tests\test_converti.py.
+CONTESTO: stiamo completando il modulo converti. I passi 1-5 sono GIÀ FATTI e verificati: in cybervallum\cli.py esistono i comandi "converti numero", "converti ip" e "converti mac". NON toccare cli.py. Ora i test della CLI: modifica SOLO tests\test_converti.py.
+Prima di iniziare esegui .venv\Scripts\python scripts\verifica.py (atteso: "VERIFICA: OK" e "91 passed"). Se no, FERMATI e mostrami l'output senza modificare nulla.
+Regole: se l'editor dice che il testo da sostituire non è unico o non esiste, FERMATI. Se una modifica è riuscita non ripeterla.
 
 PASSO 6. Tre sostituzioni.
 6a) TESTO VECCHIO:
@@ -115,6 +121,7 @@ Controllo del passo 6:
 - .venv\Scripts\python -m pytest -q tests\test_converti.py   (atteso: 38 passed)
 - .venv\Scripts\python -m pytest -q   (atteso: 96 passed)
 - .venv\Scripts\vallum test run converti   (atteso: "Suite converti: ok - passati 38")
+- .venv\Scripts\python scripts\verifica.py   (atteso: "VERIFICA: OK" e "96 passed")
 
 Riportami exit code e ultime righe di ogni controllo, poi FERMATI.
 ```
@@ -122,7 +129,8 @@ Riportami exit code e ultime righe di ogni controllo, poi FERMATI.
 ## Messaggio E (passo 7)
 
 ````text
-PASSO 6 verificato. Ultimo passo: la documentazione. Modifica SOLO docs\json.md.
+CONTESTO: stiamo completando il modulo converti. I passi 1-6 sono GIÀ FATTI e verificati (comandi e test). Ultimo passo: la documentazione. Modifica SOLO docs\json.md.
+Regole: se l'editor dice che il testo da sostituire non è unico o non esiste, FERMATI. Se una modifica è riuscita non ripeterla.
 
 PASSO 7. Una sostituzione.
 TESTO VECCHIO:
@@ -141,8 +149,8 @@ Le producono `converti numero|ip|mac --json` e `check run converti.<azione> --js
 
 ## Elenco delle azioni: `check list --json`
 
-Controllo: rileggi docs\json.md con read_files e verifica che la nuova sezione sia tra "### `dati` di `sistema.info`" e "## Elenco delle azioni".
-Riportami l'esito e FERMATI. Il commit lo fa lo sviluppatore.
+Controllo: rileggi docs\json.md con read_files e verifica che la nuova sezione sia tra "### `dati` di `sistema.info`" e "## Elenco delle azioni", e che "## Elenco delle azioni" compaia UNA sola volta. Poi esegui .venv\Scripts\python scripts\verifica.py (atteso: "VERIFICA: OK").
+Riportami l'esito e FERMATI. Non fare commit.
 ````
 
 ## Dopo il messaggio E
