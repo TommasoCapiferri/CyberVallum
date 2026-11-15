@@ -44,7 +44,17 @@ In `C:\Users\tomma\.cline\data\`:
 
 Il file si può modificare a mano (copia di sicurezza: `globalState.json.bak-2026-11-15`), ma Cline tiene le impostazioni in memoria e può riscriverle alla modifica successiva. Dopo un cambio a mano: ricaricare VS Code (*Developer: Reload Window*) e ricontrollare il file.
 
+### Exit code sbagliati (shell integration)
+Cline legge output ed exit code dei comandi attraverso la *shell integration* di VS Code. Con Windows PowerShell 5.1 e l'ambiente virtuale attivato all'apertura del terminale, la lettura a volte fallisce: Cline riporta **exit code 1 con output vuoto** anche quando il comando è riuscito, oppure "Command completion could not be observed".
+- Verificato il 15/11/2026: `py_compile` segnalato da Cline con exit code 1, mentre nel terminale `$LASTEXITCODE` valeva `0`.
+- Per controllare a mano, subito dopo un comando nel terminale: `$LASTEXITCODE` (0 = riuscito).
+- **Soluzione (verificata il 15/11/2026):** impostazioni di Cline → sezione **Terminal** → **Terminal Execution Mode: Background Exec**. Cline avvia i comandi come processo figlio, senza il terminale di VS Code, e riceve output ed exit code veri. Prova fatta: `py_compile` su un file corretto -> exit code 0; su un file inesistente -> exit code 1 con `[Errno 2] No such file or directory`. L'output dei comandi si vede nella chat di Cline, non più nel pannello del terminale.
+- **Default Terminal Profile** resta su *Default* (Windows PowerShell 5.1). Cline elenca anche profili non installati: scegliendone uno assente, ogni comando fallisce.
+- **Tentativo che NON ha funzionato (15/11/2026):** disattivare l'attivazione automatica del venv nei terminali (`"python.terminal.activateEnvironment": false` in `.vscode/settings.json`). Il terminale di Cline è partito senza `(.venv)`, ma l'exit code era ancora 1. Modifica annullata. Causa più probabile: la shell integration di Windows PowerShell 5.1 non passa l'exit code a Cline.
+
 ### Da capire (to-do)
+- [x] Exit code sbagliati: risolto con *Background Exec* (vedi sopra).
+- [ ] PowerShell 7.7 è installato (15/11/2026, pacchetto MSIX via winget, comando `pwsh`). Provare, con la stessa prova dei due `py_compile`, il profilo *PowerShell 7* in Cline ed eventualmente come terminale predefinito di VS Code.
 - [ ] Verificare nell'interfaccia di Cline dove sono esattamente le sotto-opzioni "Read all files", "Edit all files", "Execute all commands", e annotarlo qui.
 - [ ] Controllare dopo un riavvio di VS Code che le modifiche fatte a mano in `globalState.json` siano rimaste.
 - [ ] Capire da dove arrivano gli strumenti `composio_*` e se si possono disattivare del tutto (impostazioni di Cline, account Cline).

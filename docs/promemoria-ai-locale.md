@@ -13,22 +13,23 @@ Da rileggere ogni giorno prima di aprire Cline. Le spiegazioni e gli episodi da 
 6. **Approvo solo** `py_compile`, `pytest` e `vallum`. Tutto il resto (`python -c`, `powershell.exe -Command`, `Set-Content`, `Out-File`, `echo`) lo rifiuto con *Reject* e scrivo "usa l'editor".
 7. **Contatore del contesto**: oltre la metà (circa 32k su 65k) finisco il passo e apro un task nuovo. Più il contesto è lungo, peggio segue le regole.
 8. **Stop dopo 2 errori uguali**: la fermo io, non la lascio riprovare.
+9. **Terminal Execution Mode su Background Exec** (impostazioni di Cline → Terminal): così Cline legge l'exit code vero. Se torna "exit code 1 con output vuoto", controllo che l'impostazione sia ancora quella.
 
 ## Quando dice "ho finito" o "funziona"
-9. **Non mi fido del riassunto, controllo i fatti:**
+10. **Non mi fido del riassunto, controllo i fatti:**
    ```
    git status --short
    git diff
    .venv\Scripts\python -m py_compile <file nuovo>
    .venv\Scripts\python -m pytest -q
    ```
-10. **Segnali d'allarme**: `\"` nel codice, file `.old` / `.part` / `.final`, funzioni duplicate, file che non dovevano essere toccati, test di cose non richieste.
-11. **Senza l'output vero di pytest non è finito.**
+11. **Segnali d'allarme**: `\"` nel codice, file `.old` / `.part` / `.final`, funzioni duplicate, file che non dovevano essere toccati, test di cose non richieste.
+12. **Senza l'output vero di pytest non è finito.**
 
 ## Quando si incastra
-12. **Ripristino, non rattoppo**: `git restore <file>` per i file modificati, cancello quelli nuovi rotti.
-13. **Task nuovo** e messaggio con: cosa è stato ripristinato, cosa resta valido, da dove ripartire.
-14. **Al secondo fallimento** passo il lavoro a Claude.
+13. **Ripristino, non rattoppo**: `git restore <file>` per i file modificati, cancello quelli nuovi rotti.
+14. **Task nuovo** e messaggio con: cosa è stato ripristinato, cosa resta valido, da dove ripartire.
+15. **Al secondo fallimento** passo il lavoro a Claude.
 
 ## Divisione del lavoro
 - **Gemma**: file nuovi e isolati, test su un modello già scritto, piccole aggiunte guidate.
