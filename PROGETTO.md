@@ -101,7 +101,7 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 1. ✅ **[claude] Base del progetto:** `pyproject.toml` (Python 3.12, dipendenze `psutil`, `typer`, `pytest`), pacchetto `cybervallum/` con `core/config.py` (impostazioni in `config.toml`, validazione, `list/get/set`), `core/registry.py` (registrazione delle azioni `<modulo>.<azione>` con parametri e flag `modifica_sistema`, avvio unico che restituisce un dizionario), `cli.py` con i comandi `config`, `check list`, `check run … --json`, `test run … --json`; cartella `tests/` con i test di config e registry. Commit `[claude]`.
 2. **[claude] Istruzioni per Cline:** un prompt pronto da incollare per il modulo `sistema`: funzioni del core dietro piccoli adattatori di `psutil`/`platform` sostituibili nei test, registrazione nel registro, comando `cybervallum sistema info --json`, test con mock. Ricordare a Gemma mock e `--json`, che nel riassunto aveva trascurato.
 3. ✅ **[locale] Modulo `sistema`:** scritto da Gemma, non funzionante (commit `[locale]` acc0728); corretto e completato da Claude (commit `[claude]`).
-4. **[claude] Revisione** del modulo `sistema`: ✅ fatta insieme al passo 3. Resta l'aggiornamento del README ("Cosa può fare oggi"), da mostrare allo sviluppatore prima del commit.
+4. ✅ **[claude] Revisione** del modulo `sistema`, fatta insieme al passo 3; README aggiornato (comandi disponibili, `converti` in sviluppo).
 5. **Prima di dare a Gemma il prossimo modulo**, leggere `docs/ai-locale.md` (come lavora l'AI locale, i suoi punti deboli, come scriverle i prompt).
 
 ## Registro delle sessioni

@@ -12,18 +12,30 @@ CyberVallum è un **progetto personale di studio**, con tre obiettivi:
 Non è un prodotto finito né un software destinato all'uso professionale: è un ambiente di sperimentazione che cresce in modo incrementale.
 
 ## Funzionalità disponibili
-Il progetto è in fase iniziale e **non dispone ancora di funzionalità utilizzabili**.
-Sono definiti la struttura, le regole di sviluppo e la roadmap.
+| Comando | Funzione |
+|---|---|
+| `vallum sistema info` | Sistema operativo, CPU (modello, core, frequenza, utilizzo), memoria, dischi e ultimo avvio |
+| `vallum config list\|get\|set` | Lettura e modifica delle impostazioni, con validazione dei valori |
+| `vallum check list\|run` | Elenco ed esecuzione dei controlli registrati |
+| `vallum test list\|run` | Elenco ed esecuzione delle suite di test, con esito strutturato |
+
+Ogni comando accetta l'opzione `--json`, che produce un output stabile documentato in [docs/json.md](docs/json.md). `cybervallum` e `vallum` sono lo stesso comando.
+
+Installazione per lo sviluppo (Python 3.12):
+
+```
+py -3.12 -m venv .venv
+.venv\Scripts\python -m pip install -e .
+```
 
 ## In sviluppo
 | Modulo | Funzione |
 |---|---|
-| `sistema` | CPU, core, memoria, dischi, sistema operativo, ultimo avvio |
+| `converti` | Conversioni tra binario, decimale ed esadecimale; rappresentazione degli indirizzi IP |
 
 ## Obiettivi
 | Modulo | Funzione |
 |---|---|
-| `converti` | Conversioni tra binario, decimale ed esadecimale; rappresentazione degli indirizzi IP |
 | `processi` | Processi attivi e consumo di risorse |
 | `diagnosi` | Diagnosi della connettività: interfaccia di rete, gateway, Internet, DNS |
 | `lan` | Rilevamento dei dispositivi della rete locale, calcolo delle sottoreti |
