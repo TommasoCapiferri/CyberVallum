@@ -5,7 +5,7 @@
 
 ## Cos'è
 Un'app **da terminale e desktop**, per **Windows e Ubuntu**, che aiuta nella sistemistica, nella sicurezza e nel controllo della rete.
-Lo sviluppatore la costruisce mentre studia: **ogni capitolo del percorso di studio diventa un modulo**. Il percorso è in `..\Studio-Sistemista`.
+Lo sviluppatore la costruisce mentre studia: **ogni capitolo del percorso di studio diventa un modulo**. Il percorso è in `..\Studio-Sistemista-CyberSecurity`.
 Il nome viene dal "fiuto" del segugio, ed è dedicato a Titty, la sua cagnolina 🐶.
 
 ## Architettura (decisa il 2026-11-15)
@@ -26,6 +26,16 @@ Il nome viene dal "fiuto" del segugio, ed è dedicato a Titty, la sua cagnolina 
 - **Linguaggio:** Python 3.12. **Multipiattaforma:** usare `psutil`, `pathlib`, `platform`; evitare comandi specifici di un solo sistema. Se servono, usare un ramo per Windows e uno per Linux.
 - **Prima il core e la CLI**, poi l'API e la GUI sopra lo stesso core.
 - **Un solo motore, tre ingressi:** CLI, API e GUI non contengono logica. Chiamano `core.config` per le impostazioni e `core.registry` per avviare controlli e test, e restituiscono lo stesso JSON.
+
+### Come si aggiunge un modulo (es. `sistema`)
+1. File `cybersegugio/core/<modulo>.py`. Le chiamate al sistema (`psutil`, `platform`, comandi) stanno in piccole funzioni private (`_read_cpu()`, ...) che i test sostituiscono con `monkeypatch`. Le funzioni pubbliche restituiscono dizionari e non stampano.
+2. Si registrano le azioni con `@registry.action("<modulo>.<azione>", "descrizione", params={...}, modifica_sistema=False)`. Le azioni con `modifica_sistema=True` ricevono il parametro `dry_run` dal registro.
+3. Si aggiunge `"cybersegugio.core.<modulo>"` a `BUILTIN_MODULES` in `core/registry.py` e una suite con `default_registry.add_suite(...)`.
+4. In `cli.py` si aggiunge un gruppo di comandi che chiama solo `registry.run(...)` e `_finish(...)`, con l'opzione `--json`.
+5. Si scrive `tests/test_<modulo>.py` con i mock e si documenta il formato di `dati` in `docs/json.md`.
+6. Per eventuali impostazioni del modulo si usa `config.register_setting(Setting(...))`. Mai leggere file o variabili d'ambiente direttamente.
+
+**Ambiente di sviluppo:** `py -3.12 -m venv .venv`, poi `.venv\Scripts\python -m pip install -e .` e `.venv\Scripts\python -m pytest`. Il formato `--json` è documentato in `docs/json.md`.
 
 ## Il README
 Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **Cosa può fare oggi** (moduli funzionanti), **In sviluppo** (il modulo su cui si sta lavorando) e **Obiettivi** (moduli futuri). Deve restare chiaro che è un **progetto personale per esercitarsi con l'AI**.
@@ -73,19 +83,20 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 | `servizi` | Fase 3 · Sistemi | servizi, log, utenti, spazio su disco | ⬜ |
 | `sicurezza` | Fase 4 · Cybersecurity | controllo dell'hardening, porte aperte sul proprio PC, analisi dei log | ⬜ |
 | `ai` | trasversale | domande in linguaggio naturale sui risultati ("perché il PC è lento?") | ⬜ |
-| `config` | trasversale, con `sistema` | modulo unico delle impostazioni e registro dei controlli e dei test, comandi `config`, `check` e `test` della CLI | ⬜ da fare insieme al primo modulo |
+| `config` | trasversale, con `sistema` | modulo unico delle impostazioni e registro dei controlli e dei test, comandi `config`, `check` e `test` della CLI | ✅ base pronta (15/11) |
 | `aggiornamenti` | Fase 4 · Cybersecurity | download pianificato e verificato dei dati di sicurezza (CVE, CISA KEV, liste di indirizzi malevoli, regole di hardening) in una cache locale con versioni | ⬜ |
 | `api` | dopo i primi moduli | API REST locale (FastAPI) per impostazioni, controlli e test; documentazione automatica OpenAPI; test con pytest e il client di prova di FastAPI | ⬜ |
 | `gui` | dopo i primi moduli | interfaccia desktop, con localizzatori per i test | ⬜ |
 | `test-lab` | Fase 0 (VirtualBox) e Fase 1 (Reti) | VM di laboratorio per simulare i guasti: scheda scollegata, niente DHCP, gateway irraggiungibile, DNS errato, latenza e perdita di pacchetti con `tc netem`; test automatici su Windows e Ubuntu | ⬜ |
 
 ## Stato attuale
-- 2026-11-15: progetto creato. Ci sono solo la documentazione e la struttura, **ancora nessun codice**.
+- 2026-11-15: progetto creato.
+- 2026-11-15: **base del codice pronta** (passo 1): `pyproject.toml`, `core/convert.py`, `core/config.py` (impostazioni validate in `config.toml`; host dell'API solo loopback, fonti solo HTTPS), `core/registry.py` (azioni `<modulo>.<azione>`, dry-run e conferma per `modifica_sistema`, suite pytest con esito JSON), `cli.py` (`config list|get|set`, `check list|run`, `test list|run`, tutti con `--json`), `docs/json.md`. 49 test superati.
 - Git 2.56 e GitHub CLI installati. Repository pubblico: https://github.com/TommasoCapiferri/CyberSegugio (ramo `main`). Dopo ogni commit: `git push`.
 - AI locale: Ollama 0.40.16, in ascolto solo su 127.0.0.1. Modello **`gemma4:12b-it-qat`** (7,2 GB) scaricato il 15/11: gira al 100% sulla GPU RTX 5070 a circa 68-71 token/s anche con contesto da 64k (7,7 GB occupati). Contesto predefinito impostato con `OLLAMA_CONTEXT_LENGTH=65536` (variabile d'ambiente dell'utente). Cline installato in VS Code e collegato a Ollama (provider Ollama, modello `gemma4:12b-it-qat`, contesto 65536, timeout 300000 ms); prima prova superata il 15/11 (Gemma riassume correttamente progetto, primo modulo, regole dei test e dei commit; trascura i mock e `--json`).
 
 ## Prossimi passi
-1. **[claude] Base del progetto:** `pyproject.toml` (Python 3.12, dipendenze `psutil`, `typer`, `pytest`), pacchetto `cybersegugio/` con `core/config.py` (impostazioni in `config.toml`, validazione, `list/get/set`), `core/registry.py` (registrazione delle azioni `<modulo>.<azione>` con parametri e flag `modifica_sistema`, avvio unico che restituisce un dizionario), `cli.py` con i comandi `config`, `check list`, `check run … --json`, `test run … --json`; cartella `tests/` con i test di config e registry. Commit `[claude]`.
+1. ✅ **[claude] Base del progetto:** `pyproject.toml` (Python 3.12, dipendenze `psutil`, `typer`, `pytest`), pacchetto `cybersegugio/` con `core/config.py` (impostazioni in `config.toml`, validazione, `list/get/set`), `core/registry.py` (registrazione delle azioni `<modulo>.<azione>` con parametri e flag `modifica_sistema`, avvio unico che restituisce un dizionario), `cli.py` con i comandi `config`, `check list`, `check run … --json`, `test run … --json`; cartella `tests/` con i test di config e registry. Commit `[claude]`.
 2. **[claude] Istruzioni per Cline:** un prompt pronto da incollare per il modulo `sistema`: funzioni del core dietro piccoli adattatori di `psutil`/`platform` sostituibili nei test, registrazione nel registro, comando `cybersegugio sistema info --json`, test con mock. Ricordare a Gemma mock e `--json`, che nel riassunto aveva trascurato.
 3. **[locale] Modulo `sistema`:** lo scrive Cline con Gemma seguendo il prompt; commit `[locale]`.
 4. **[claude] Revisione** del modulo `sistema`, aggiornamento del README ("Cosa può fare oggi") e della roadmap.
@@ -97,3 +108,4 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 | 2026-11-15 | [claude] | Pubblicato su GitHub |
 | 2026-11-15 | [claude] | Regole e roadmap del testing automatico (localizzatori, `test-lab`); Cline collegato a Ollama |
 | 2026-11-15 | [claude] | Regola 10: impostazioni, controlli e test comandabili da CLI e API; moduli `config` e `api` nella roadmap; regola 11 e modulo `aggiornamenti` (dati di sicurezza scaricati e verificati) |
+| 2026-11-15 | [claude] | Passo 1: base del codice (config, registry, CLI con `--json`, test, docs/json.md) |

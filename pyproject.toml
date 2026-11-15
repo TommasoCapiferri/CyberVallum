@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cybersegugio"
+version = "0.1.0"
+description = "Strumento personale da terminale per sistemistica, sicurezza e controllo della rete."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "psutil>=5.9",
+    "typer>=0.12",
+    "pytest>=8.0",
+    "tomli-w>=1.0",
+]
+
+[project.scripts]
+cybersegugio = "cybersegugio.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["cybersegugio*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
