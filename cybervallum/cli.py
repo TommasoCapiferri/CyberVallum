@@ -30,6 +30,8 @@ app.add_typer(config_app, name="config")
 app.add_typer(check_app, name="check")
 app.add_typer(test_app, name="test")
 app.add_typer(sistema_app, name="sistema")
+converti_app = typer.Typer(help="Conversioni tra basi numeriche, indirizzi IPv4 e MAC.", no_args_is_help=True)
+app.add_typer(converti_app, name="converti")
 
 JsonOpt = typer.Option(False, "--json", help="Output in JSON stabile (vedi docs/json.md).")
 
