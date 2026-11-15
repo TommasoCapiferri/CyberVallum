@@ -48,10 +48,11 @@ Il nome viene dal "fiuto" del segugio, ed è dedicato a Titty, la sua cagnolina 
 
 ## Stato attuale
 - 2026-11-15: progetto creato. Ci sono solo la documentazione e la struttura, **ancora nessun codice**.
-- Git: **da installare** (serve l'approvazione dello sviluppatore nella finestra di Windows). Poi `git init` e il primo commit.
+- Git 2.56 e GitHub CLI installati. Repository pubblico: https://github.com/TommasoCapiferri/CyberSegugio (ramo `main`). Dopo ogni commit: `git push`.
 - AI locale: Ollama 0.40.16 installato, in ascolto solo su 127.0.0.1. Modello: da scaricare (proposto `gemma4:12b-it-qat`). Cline: da installare in VS Code.
 
 ## Registro delle sessioni
 | Data | Chi | Cosa è stato fatto |
 |---|---|---|
 | 2026-11-15 | [claude] | Creazione del progetto: PROGETTO.md, CLAUDE.md, .clinerules, README, licenza, .gitignore |
+| 2026-11-15 | [claude] | Pubblicato su GitHub |
