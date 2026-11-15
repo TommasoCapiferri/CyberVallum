@@ -25,6 +25,8 @@ Il nome viene dal "fiuto" del segugio, ed è dedicato a Titty, la sua cagnolina 
 
 ## Il README
 Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **Cosa può fare oggi** (moduli funzionanti), **In sviluppo** (il modulo su cui si sta lavorando) e **Obiettivi** (moduli futuri). Deve restare chiaro che è un **progetto personale per esercitarsi con l'AI**.
+**Tono:** serio e professionale in tutto il progetto (README, messaggi del programma, documentazione, commit). Niente emoji nei titoli, niente giochi di parole sul cane. L'unica eccezione è la **dedica a Titty in fondo al README**, che può avere una battuta.
+**Prima di pubblicare** modifiche al README o a testi pubblici, mostrale allo sviluppatore e attendi il suo ok.
 
 ## Regole del codice
 1. **Sola lettura come impostazione predefinita.** Ogni funzione che modifica il sistema (ferma processi, cambia configurazioni) chiede conferma esplicita e ha un'opzione `--dry-run`.
