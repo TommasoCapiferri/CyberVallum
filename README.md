@@ -31,6 +31,8 @@ Sono definiti la struttura, le regole di sviluppo e la roadmap.
 | `servizi` | Servizi, log e utenti |
 | `sicurezza` | Verifiche di hardening e porte in ascolto sul sistema locale |
 | `ai` | Interrogazione dei risultati in linguaggio naturale tramite un modello locale |
+| `aggiornamenti` | Aggiornamento automatico e verificato dei dati di sicurezza (vulnerabilità note, indirizzi malevoli, regole di hardening), utilizzabile anche offline |
+| `api` | API REST locale: ogni funzione dello strumento, comprese le impostazioni, i controlli e i test, è disponibile anche da script e strumenti di automazione |
 | `gui` | Interfaccia desktop basata sullo stesso motore della riga di comando |
 
 Lo stato dettagliato e il registro dello sviluppo sono disponibili in [PROGETTO.md](PROGETTO.md).
@@ -42,6 +44,7 @@ Il progetto è pensato per essere verificabile automaticamente fin dall'inizio, 
 |---|---|---|
 | **Motore** | Le funzioni di analisi restituiscono dati strutturati, senza stampare a video: si verificano in isolamento, anche simulando le risposte del sistema | `pytest` |
 | **Riga di comando** | Ogni comando prevede l'opzione `--json`, con un output leggibile da script, test e altri strumenti di automazione | `pytest` |
+| **API** | Le impostazioni, i controlli e le suite di test sono disponibili anche tramite un'API REST locale, che restituisce gli stessi dati della riga di comando | `pytest` con il client di prova di FastAPI |
 | **Interfaccia desktop** | Ogni elemento interattivo ha un **localizzatore stabile**, secondo la convenzione `<modulo>-<tipo>-<nome>` (es. `sistema-btn-aggiorna`) | `pywinauto` e `pytest-qt` per un'interfaccia Qt, oppure `Playwright` con attributi `data-testid` per un'interfaccia basata su tecnologie web |
 
 ### Laboratorio di simulazione dei guasti

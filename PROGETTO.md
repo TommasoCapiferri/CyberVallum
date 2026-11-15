@@ -13,7 +13,10 @@ Il nome viene dal "fiuto" del segugio, ed è dedicato a Titty, la sua cagnolina 
  cybersegugio/
  ├── core/        ← il "motore": funzioni Python pure, una per modulo (sistema, processi, rete…)
  │                  restituiscono dati (dizionari/oggetti), NON stampano nulla
+ │   ├── config.py    ← UNICO punto per leggere, validare e salvare le impostazioni
+ │   └── registry.py  ← elenco dei controlli e dei test eseguibili, con un solo punto di avvio
  ├── cli.py       ← comando da terminale (Typer): `cybersegugio <modulo> <azione>`
+ ├── api/         ← (più avanti) API REST locale (FastAPI) sopra lo stesso core
  ├── gui/         ← (più avanti) interfaccia desktop sopra lo stesso core
  └── ai/          ← (più avanti) assistente AI intercambiabile:
                     • Ollama in locale (predefinito, gratis)
@@ -21,7 +24,8 @@ Il nome viene dal "fiuto" del segugio, ed è dedicato a Titty, la sua cagnolina 
  tests/           ← test con pytest, uno per modulo
 ```
 - **Linguaggio:** Python 3.12. **Multipiattaforma:** usare `psutil`, `pathlib`, `platform`; evitare comandi specifici di un solo sistema. Se servono, usare un ramo per Windows e uno per Linux.
-- **Prima il core e la CLI**, poi la GUI sopra lo stesso core.
+- **Prima il core e la CLI**, poi l'API e la GUI sopra lo stesso core.
+- **Un solo motore, tre ingressi:** CLI, API e GUI non contengono logica. Chiamano `core.config` per le impostazioni e `core.registry` per avviare controlli e test, e restituiscono lo stesso JSON.
 
 ## Il README
 Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **Cosa può fare oggi** (moduli funzionanti), **In sviluppo** (il modulo su cui si sta lavorando) e **Obiettivi** (moduli futuri). Deve restare chiaro che è un **progetto personale per esercitarsi con l'AI**.
@@ -42,6 +46,20 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
    - **GUI:** ogni elemento interattivo ha un **localizzatore stabile** con la convenzione `<modulo>-<tipo>-<nome>` (es. `sistema-btn-aggiorna`, `diagnosi-tabella-risultati`). Tipi: `btn`, `campo`, `tabella`, `etichetta`, `menu`, `scheda`. In Qt va impostato sia `objectName` sia `accessibleName`; in un'interfaccia web, `data-testid`;
    - la scelta della GUI (Qt con pywinauto/pytest-qt, oppure tecnologia web con Playwright) si fa quando si arriva al modulo `gui`. Lo sviluppatore conosce già Playwright.
 9. **Simulazione dei guasti solo in VM:** le prove che rompono la rete (scheda scollegata, DNS errato, `tc netem`, firewall) si fanno **solo nelle macchine virtuali del laboratorio**, mai sul PC di sviluppo né sulla rete di casa.
+10. **API first: ogni funzione è disponibile anche via API.** Una funzione è completa solo quando è registrata in `core.registry` e quindi raggiungibile da CLI e API (e dalla GUI quando ci sarà). Niente funzioni solo da GUI o solo da CLI. Così lo strumento è automatizzabile e aperto a script, test, altre applicazioni e all'assistente `ai`.
+    **Impostazioni, controlli e test comandabili da fuori:**
+    - **impostazioni:** nessun modulo legge file o variabili per conto suo; tutto passa da `core.config`, che valida i valori e li salva in `config.toml` (i segreti restano nel `.env`). CLI: `cybersegugio config list|get|set`;
+    - **controlli:** ogni azione di un modulo si registra in `core.registry` con nome (`<modulo>.<azione>`), parametri e il flag `modifica_sistema`. CLI: `cybersegugio check list` e `cybersegugio check run <modulo>.<azione> --json`;
+    - **test:** anche le suite di test (pytest e scenari del `test-lab`) si avviano dal registro e producono un esito JSON: stato, durata, test passati e falliti, dettagli. CLI: `cybersegugio test run <suite> --json`;
+    - **API REST (modulo `api`):** gli stessi comandi via HTTP, con versione nel percorso (`/api/v1/…`): `GET /health`, `GET|PUT /config`, `GET /checks`, `POST /checks/{nome}`, `POST /tests` (restituisce l'id di un'esecuzione), `GET /tests/{id}` (stato ed esito). Le operazioni lunghe sono asincrone: si avviano e poi si interroga lo stato;
+    - **sicurezza dell'API:** in ascolto **solo su `127.0.0.1`** (nel `test-lab` solo sulla rete interna delle VM), con un token preso dal `.env`; le azioni con `modifica_sistema` valgono le regole 1 e 2: `dry_run` vero per default ed esecuzione reale solo con `"conferma": true` esplicito. "Aperta" significa estendibile e automatizzabile, **non** esposta su Internet.
+11. **Dati di sicurezza aggiornati automaticamente (modulo `aggiornamenti`):**
+    - lo strumento scarica **dati, mai codice**: elenchi di vulnerabilità (es. NVD/CVE, catalogo CISA KEV), liste di indirizzi e domini malevoli, regole di hardening, porte e servizi noti. Ciò che viene scaricato non si esegue mai;
+    - le **fonti** sono configurabili in `core.config`, solo **HTTPS**, con verifica dell'integrità (hash o firma, quando la fonte li fornisce) e del formato prima di usarle;
+    - i dati vanno in una **cache locale con versione e data**; se l'aggiornamento fallisce resta valida l'ultima versione buona, e lo strumento funziona anche **offline**;
+    - aggiornamento a richiesta o pianificato (`cybersegugio aggiornamenti run`, `POST /api/v1/aggiornamenti`), con stato consultabile (`GET /api/v1/aggiornamenti`): fonte, versione, data, esito;
+    - nessuna telemetria: le richieste verso le fonti non inviano dati sul PC o sulla rete dello sviluppatore; si rispettano le condizioni d'uso e i limiti di frequenza di ogni fonte (chiavi API nel `.env`);
+    - i moduli (`sicurezza`, `lan`, `ai`…) leggono questi dati solo tramite il core, per esempio per segnalare un software installato con vulnerabilità note o una connessione verso un indirizzo segnalato.
 
 ## Roadmap (collegata al percorso di studio)
 | Modulo | Collegato a | Funzioni | Stato |
@@ -55,16 +73,27 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 | `servizi` | Fase 3 · Sistemi | servizi, log, utenti, spazio su disco | ⬜ |
 | `sicurezza` | Fase 4 · Cybersecurity | controllo dell'hardening, porte aperte sul proprio PC, analisi dei log | ⬜ |
 | `ai` | trasversale | domande in linguaggio naturale sui risultati ("perché il PC è lento?") | ⬜ |
+| `config` | trasversale, con `sistema` | modulo unico delle impostazioni e registro dei controlli e dei test, comandi `config`, `check` e `test` della CLI | ⬜ da fare insieme al primo modulo |
+| `aggiornamenti` | Fase 4 · Cybersecurity | download pianificato e verificato dei dati di sicurezza (CVE, CISA KEV, liste di indirizzi malevoli, regole di hardening) in una cache locale con versioni | ⬜ |
+| `api` | dopo i primi moduli | API REST locale (FastAPI) per impostazioni, controlli e test; documentazione automatica OpenAPI; test con pytest e il client di prova di FastAPI | ⬜ |
 | `gui` | dopo i primi moduli | interfaccia desktop, con localizzatori per i test | ⬜ |
 | `test-lab` | Fase 0 (VirtualBox) e Fase 1 (Reti) | VM di laboratorio per simulare i guasti: scheda scollegata, niente DHCP, gateway irraggiungibile, DNS errato, latenza e perdita di pacchetti con `tc netem`; test automatici su Windows e Ubuntu | ⬜ |
 
 ## Stato attuale
 - 2026-11-15: progetto creato. Ci sono solo la documentazione e la struttura, **ancora nessun codice**.
 - Git 2.56 e GitHub CLI installati. Repository pubblico: https://github.com/TommasoCapiferri/CyberSegugio (ramo `main`). Dopo ogni commit: `git push`.
-- AI locale: Ollama 0.40.16, in ascolto solo su 127.0.0.1. Modello **`gemma4:12b-it-qat`** (7,2 GB) scaricato il 15/11: gira al 100% sulla GPU RTX 5070 a circa 68-71 token/s anche con contesto da 64k (7,7 GB occupati). Contesto predefinito impostato con `OLLAMA_CONTEXT_LENGTH=65536` (variabile d'ambiente dell'utente). Cline: da installare in VS Code e collegare a Ollama.
+- AI locale: Ollama 0.40.16, in ascolto solo su 127.0.0.1. Modello **`gemma4:12b-it-qat`** (7,2 GB) scaricato il 15/11: gira al 100% sulla GPU RTX 5070 a circa 68-71 token/s anche con contesto da 64k (7,7 GB occupati). Contesto predefinito impostato con `OLLAMA_CONTEXT_LENGTH=65536` (variabile d'ambiente dell'utente). Cline installato in VS Code e collegato a Ollama (provider Ollama, modello `gemma4:12b-it-qat`, contesto 65536, timeout 300000 ms); prima prova superata il 15/11 (Gemma riassume correttamente progetto, primo modulo, regole dei test e dei commit; trascura i mock e `--json`).
+
+## Prossimi passi
+1. **[claude] Base del progetto:** `pyproject.toml` (Python 3.12, dipendenze `psutil`, `typer`, `pytest`), pacchetto `cybersegugio/` con `core/config.py` (impostazioni in `config.toml`, validazione, `list/get/set`), `core/registry.py` (registrazione delle azioni `<modulo>.<azione>` con parametri e flag `modifica_sistema`, avvio unico che restituisce un dizionario), `cli.py` con i comandi `config`, `check list`, `check run … --json`, `test run … --json`; cartella `tests/` con i test di config e registry. Commit `[claude]`.
+2. **[claude] Istruzioni per Cline:** un prompt pronto da incollare per il modulo `sistema`: funzioni del core dietro piccoli adattatori di `psutil`/`platform` sostituibili nei test, registrazione nel registro, comando `cybersegugio sistema info --json`, test con mock. Ricordare a Gemma mock e `--json`, che nel riassunto aveva trascurato.
+3. **[locale] Modulo `sistema`:** lo scrive Cline con Gemma seguendo il prompt; commit `[locale]`.
+4. **[claude] Revisione** del modulo `sistema`, aggiornamento del README ("Cosa può fare oggi") e della roadmap.
 
 ## Registro delle sessioni
 | Data | Chi | Cosa è stato fatto |
 |---|---|---|
 | 2026-11-15 | [claude] | Creazione del progetto: PROGETTO.md, CLAUDE.md, .clinerules, README, licenza, .gitignore |
 | 2026-11-15 | [claude] | Pubblicato su GitHub |
+| 2026-11-15 | [claude] | Regole e roadmap del testing automatico (localizzatori, `test-lab`); Cline collegato a Ollama |
+| 2026-11-15 | [claude] | Regola 10: impostazioni, controlli e test comandabili da CLI e API; moduli `config` e `api` nella roadmap; regola 11 e modulo `aggiornamenti` (dati di sicurezza scaricati e verificati) |
