@@ -4,14 +4,25 @@
 
 > Dedicato a **Titty**, la mia cagnolina, che di fiuto se ne intende. 🐶
 
-## Perché esiste
-Lo sto costruendo mentre studio da sistemista e cybersecurity: ogni argomento che imparo diventa una funzione dello strumento.
-Lo sviluppo con un'AI locale (Ollama + Gemma) e con Claude Code.
+## 🧪 Un progetto personale per esercitarmi con l'AI
+CyberSegugio è un **progetto personale di studio**. Lo uso per due cose:
+- **mettere in pratica** quello che studio su sistemi, reti e sicurezza: ogni argomento diventa una funzione dello strumento
+- **imparare a sviluppare insieme all'intelligenza artificiale**: un'AI locale che gira sul mio PC (Ollama + Gemma, con Cline in VS Code) per il lavoro di tutti i giorni, e Claude Code per architettura e revisione del codice
 
-## Moduli previsti
-| Modulo | Cosa fa |
+Non è un prodotto finito né un software professionale: è un laboratorio, e cresce un passo alla volta.
+
+## ✅ Cosa può fare oggi
+Il progetto è appena nato: **non ha ancora funzioni utilizzabili**.
+Sono pronti la struttura, le regole di sviluppo e la roadmap.
+
+## 🔧 In sviluppo
+| Modulo | Cosa farà |
 |---|---|
-| `sistema` | CPU, RAM, dischi, sistema operativo |
+| `sistema` | CPU, core, RAM, dischi, sistema operativo, ultimo avvio |
+
+## 🎯 Obiettivi
+| Modulo | Cosa farà |
+|---|---|
 | `converti` | Conversioni binario, decimale, esadecimale, indirizzi IP |
 | `processi` | Processi attivi e consumo di risorse |
 | `diagnosi` | Diagnosi della connessione: scheda → gateway → Internet → DNS |
@@ -19,8 +30,10 @@ Lo sviluppo con un'AI locale (Ollama + Gemma) e con Claude Code.
 | `voip` | Analisi delle chiamate SIP/RTP da catture di rete |
 | `servizi` | Servizi, log e utenti |
 | `sicurezza` | Controlli di hardening e porte aperte sul proprio sistema |
+| `ai` | Domande in linguaggio naturale sui risultati, con un'AI locale |
+| `gui` | Interfaccia desktop sopra lo stesso motore del terminale |
 
-🚧 **In sviluppo.** Lo stato aggiornato è in [PROGETTO.md](PROGETTO.md).
+Lo stato dettagliato e il registro dello sviluppo sono in [PROGETTO.md](PROGETTO.md).
 
 ## ⚖️ Uso responsabile
 Le funzioni di analisi della rete vanno usate **solo su reti e sistemi di tua proprietà o per cui hai un'autorizzazione esplicita**.
