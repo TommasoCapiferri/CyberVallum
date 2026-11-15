@@ -3,7 +3,7 @@
 **Prima di tutto leggi `PROGETTO.md`**: lì ci sono architettura, regole, roadmap, stato e registro, condivisi con l'AI locale (Cline + Ollama).
 
 ## Lo sviluppatore
-- Sta studiando da sistemista e cybersecurity (vedi `..\Studio-Sistemista`). Conosce un po' Python. Rispondi in **italiano**.
+- Sta studiando da sistemista e cybersecurity (vedi `..\Studio-Sistemista-CyberSecurity`). Conosce un po' Python. Rispondi in **italiano**.
 - Vuole **imparare**: spiega le scelte e i comandi pezzo per pezzo, non limitarti a scrivere codice.
 - Usa questo progetto con **due AI**: l'AI locale per il lavoro quotidiano e Claude Code (abbonamento Pro, con limiti di utilizzo) per architettura, problemi difficili e revisione del codice. Spendi bene le richieste: niente lavori lunghi e inutili.
 
