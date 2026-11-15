@@ -1,6 +1,6 @@
 # Prompt per Gemma: modulo `converti`, giro 2
 
-Prompt preparati da Claude il 16/11/2026 e provati prima su una copia del progetto (96 test superati alla fine). Si incollano in Cline, modalità **Act**, uno alla volta; dopo ogni messaggio si controlla che i risultati corrispondano a quelli attesi.
+Prompt preparati da Claude il 15/11/2026 e provati prima su una copia del progetto (96 test superati alla fine). Si incollano in Cline, modalità **Act**, uno alla volta; dopo ogni messaggio si controlla che i risultati corrispondano a quelli attesi.
 
 Stato: messaggi A (passi 1-2), B (passo 3) e C (passi 4-5, commit `eadee4a`) **fatti**. Restano D ed E. Dal messaggio D i controlli usano anche `scripts\verifica.py`.
 

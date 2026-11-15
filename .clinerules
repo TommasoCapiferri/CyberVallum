@@ -1,20 +1,21 @@
 # Regole per Cline (AI locale) · CyberVallum
 
-- All'inizio di ogni attività leggi `PROGETTO.md`: architettura, regole del codice, roadmap e stato del progetto. Segui quelle regole.
+- Il prompt contiene il contesto che ti serve (cosa è già fatto, cosa modificare, i controlli). Leggi `PROGETTO.md` solo se il prompt lo chiede o se ti serve una regola del codice: è lungo e riempie il contesto.
 - Rispondi in italiano. Codice e commenti in inglese.
-- Fai una cosa alla volta e mostra le modifiche prima di applicarle.
+- Fai una cosa alla volta: un passo, i suoi controlli, poi il passo successivo.
 - Non eseguire comandi che modificano il sistema senza che l'utente lo chieda esplicitamente.
 - Scansioni e test di rete solo sulla rete di casa e sul laboratorio dell'utente.
 - NON modificare `PROGETTO.md` di tua iniziativa: lo aggiorna Claude dopo la revisione. Modificalo solo se il prompt lo chiede esplicitamente. Il prefisso dei commit per il tuo lavoro è `[locale]`.
 - Se una regola di questo file e il prompt si contraddicono, vale il prompt.
 
 ## Come modificare i file e usare il terminale (vedi `docs/ai-locale.md`)
-- Crea e modifica i file SOLO con gli strumenti dell'editor di Cline, mai con comandi del terminale.
-- Nei file esistenti fai modifiche piccole con replace_in_file; non riscrivere mai un file intero.
-- Usa il terminale solo per eseguire i test e il programma, non per scrivere file.
+- Strumenti di questa versione di Cline: `read_files` per leggere, `editor` per creare e modificare i file, `run_commands` per eseguire comandi. `write_to_file` e `replace_in_file` NON esistono qui: non usarli.
+- Crea e modifica i file SOLO con `editor`, mai con comandi del terminale.
+- Nei file esistenti fai modifiche piccole con `editor` (sostituisci un testo corto e unico); non riscrivere mai un file intero.
+- Usa `run_commands` solo per eseguire i test, il verificatore e il programma, non per scrivere file.
 - Se lo stesso comando o la stessa modifica fallisce 2 volte, fermati e mostra l'errore.
 - Regola anti-loop: prima di ogni chiamata a uno strumento confrontala con le tue chiamate precedenti. Se stai per rifare la STESSA chiamata (stesso strumento, stesso file, stesso testo) per la terza volta, anche se le volte prima era riuscita, NON farla: fermati e scrivi cosa hai fatto, cosa vedi e cosa ti aspettavi.
-- Una modifica riuscita non si ripete. Dopo un replace_in_file riuscito rileggi il file UNA volta e passa ai controlli del prompt.
+- Una modifica riuscita non si ripete. Dopo una modifica riuscita con `editor` rileggi il file UNA volta e passa ai controlli del prompt.
 - Se l'editor dice che il testo da sostituire non è unico o non esiste, FERMATI e dillo: non allargare la ricerca e non scegliere tu quale copia modificare.
 - Non rifare passi che il prompt dice già fatti. Se trovi già nel file il codice che dovresti aggiungere, FERMATI e chiedi.
 - Se ti accorgi che il tuo ragionamento ripete le stesse frasi o gli stessi piani, fermati e chiedi all'utente.

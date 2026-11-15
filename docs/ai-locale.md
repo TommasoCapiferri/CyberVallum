@@ -54,7 +54,7 @@ Cline legge output ed exit code dei comandi attraverso la *shell integration* di
 
 ### Da capire (to-do)
 - [x] Exit code sbagliati: risolto con *Background Exec* (vedi sopra).
-- [x] **Fatto il 16/11/2026:** PowerShell 7.7.0 è il terminale predefinito di VS Code (verificato con `$PSVersionTable.PSVersion`). Resta da provare il profilo *PowerShell 7* anche in Cline.
+- [x] **Fatto il 15/11/2026:** PowerShell 7.7.0 è il terminale predefinito di VS Code (verificato con `$PSVersionTable.PSVersion`). Resta da provare il profilo *PowerShell 7* anche in Cline.
 - (storico) PowerShell 7 come terminale predefinito. È già installato (15/11/2026, pacchetto MSIX via winget, comando `pwsh`), ma VS Code non lo elencava perché era aperto da prima dell'installazione: chiuderlo e riaprirlo. Provare, con la stessa prova dei due `py_compile`, il profilo *PowerShell 7* in Cline ed eventualmente come terminale predefinito di VS Code.
 - [ ] Verificare nell'interfaccia di Cline dove sono esattamente le sotto-opzioni "Read all files", "Edit all files", "Execute all commands", e annotarlo qui.
 - [ ] Controllare dopo un riavvio di VS Code che le modifiche fatte a mano in `globalState.json` siano rimaste.
@@ -107,7 +107,7 @@ Le regole erano sia nel prompt sia in `.clinerules` ("file solo con l'editor, ma
 Lezioni:
 
 - **Le regole scritte non bastano**: quando l'editor le sembra scomodo, Gemma torna al terminale. Serve un blocco *tecnico*: in Cline, nelle impostazioni di approvazione automatica (*Auto-approve*), disattivare **Execute commands**. Così ogni comando aspetta il tuo "Approve", e quelli che scrivono file (`python -c`, `Set-Content`, `Out-File`, `echo >`, `powershell.exe -Command`) si rifiutano con *Reject*.
-- **File grandi a pezzi**: si crea prima uno scheletro piccolo con dei segnaposto (`# STEP-2-HERE`), poi ogni funzione si aggiunge sostituendo il segnaposto con `replace_in_file`. Ogni modifica resta sotto il limite dell'editor.
+- **File grandi a pezzi**: si crea prima uno scheletro piccolo con dei segnaposto (`# STEP-2-HERE`), poi ogni funzione si aggiunge sostituendo il segnaposto con `editor`. Ogni modifica resta sotto il limite dell'editor.
 - **Controllo dopo ogni file**: `.venv\Scripts\python -m py_compile <file>` (senza virgolette, quindi Gemma non lo può rovinare) rivela subito i `\"`.
 
 ### Terzo episodio: modulo `converti`, giro 1 rifatto a passi (15/11/2026, riuscito)
@@ -124,7 +124,7 @@ Cosa ha funzionato e va ripetuto:
 - **Due passi per messaggio** solo se sono dello stesso tipo e con un controllo in mezzo; se un messaggio da due passi va storto, si torna a uno.
 - **Commit di sicurezza** a metà giro (dopo il core, prima dei test).
 
-### Quarto episodio: `converti`, giro 2 (16/11/2026)
+### Quarto episodio: `converti`, giro 2 (15/11/2026)
 
 - Passi 1-2 (modifiche a `registry.py` e `cli.py`, file esistenti): corretti al primo colpo con il formato "TESTO VECCHIO = una riga corta e unica / TESTO NUOVO = la stessa riga più le aggiunte".
 - Aggiunta non richiesta: una riga nel registro di `PROGETTO.md` ("Modulo converti collegato al registro e alla CLI"), **falsa** (i comandi CLI non esistevano ancora), con data sbagliata ed emoji. Causa: `.clinerules` diceva "alla fine aggiorna PROGETTO.md", in contrasto con il prompt. **Lezione: le regole permanenti e i prompt non devono contraddirsi**; `.clinerules` ora dice che `PROGETTO.md` lo aggiorna Claude e che, in caso di conflitto, vale il prompt.
@@ -150,7 +150,7 @@ Fra un giro e l'altro: controllo dello sviluppatore e commit `[locale]`.
 Regole da mettere in ogni prompt (o in `.clinerules`, vedi sotto):
 
 - **file solo con l'editor di Cline**, mai con comandi PowerShell (`Set-Content`, `Out-File`, `echo >`, here-string);
-- nei file esistenti **solo aggiunte piccole** con `replace_in_file`, dicendo *dove* (es. "dopo la riga `app.add_typer(test_app, name="test")`"); mai riscrivere il file intero;
+- nei file esistenti **solo aggiunte piccole** con `editor`, dicendo *dove* (es. "dopo la riga `app.add_typer(test_app, name="test")`"); mai riscrivere il file intero;
 - **i comandi servono solo per eseguire** `pytest` e `vallum`;
 - **dopo 2 tentativi falliti uguali, fermati** e mostra l'errore;
 - **non dire che funziona senza mostrare l'output vero di pytest**;
@@ -185,9 +185,9 @@ Controllo veloce dei file nuovi, che non compaiono in `git diff` finché non si 
 
 Segnali d'allarme nel diff: `\"` nel codice Python, carattere invisibile `﻿` (BOM) all'inizio di un file, funzioni duplicate, file `.old` / `.bak` / `.part`, righe vuote sparite fra le funzioni.
 
-### 3b. Loop senza errori: `converti`, giro 2, messaggio C (16/11/2026)
+### 3b. Loop senza errori: `converti`, giro 2, messaggio C (15/11/2026)
 
-Il messaggio C cominciava con "PASSO 3 verificato", ma era incollato in un **task nuovo** di Cline, senza la conversazione dei messaggi A e B. Gemma l'ha letto come un ordine e ha **rifatto il passo 3**, pur notando che il codice "era già presente". Poi `# STEP-4-IP` non era più unico (i doppioni li aveva creati lei), ne ha dato la colpa a "modifiche precedenti" e ha pianificato di allargare il testo da cercare. Alla domanda "sei andata in loop?" ha risposto "No". In tutto, invece di scrivere `ip` e `mac`, Gemma ha incollato **due volte** in fondo a `cli.py` il blocco `converti` già esistente (`_print_numero`, `converti_numero` e i segnaposto), lasciando 3 copie di `# STEP-4-IP` e `# STEP-5-MAC`. Ogni `replace_in_file` era **riuscito**: la regola "se fallisce 2 volte, fermati" non scattava. Inoltre `py_compile` passava (in Python ridefinire una funzione è lecito) e pytest restava a 91. Lo rivelava solo `vallum converti ip` ("No such command 'ip'").
+Il messaggio C cominciava con "PASSO 3 verificato", ma era incollato in un **task nuovo** di Cline, senza la conversazione dei messaggi A e B. Gemma l'ha letto come un ordine e ha **rifatto il passo 3**, pur notando che il codice "era già presente". Poi `# STEP-4-IP` non era più unico (i doppioni li aveva creati lei), ne ha dato la colpa a "modifiche precedenti" e ha pianificato di allargare il testo da cercare. Alla domanda "sei andata in loop?" ha risposto "No". In tutto, invece di scrivere `ip` e `mac`, Gemma ha incollato **due volte** in fondo a `cli.py` il blocco `converti` già esistente (`_print_numero`, `converti_numero` e i segnaposto), lasciando 3 copie di `# STEP-4-IP` e `# STEP-5-MAC`. Ogni modifica con `editor` era **riuscito**: la regola "se fallisce 2 volte, fermati" non scattava. Inoltre `py_compile` passava (in Python ridefinire una funzione è lecito) e pytest restava a 91. Lo rivelava solo `vallum converti ip` ("No such command 'ip'").
 
 Lezioni:
 - la regola anti-loop deve contare le **ripetizioni**, non solo i fallimenti (aggiunta in `.clinerules`);
@@ -198,7 +198,7 @@ Lezioni:
 
 Esito del messaggio C riscritto (autosufficiente): passi 4 e 5 corretti al primo colpo. Il passo 5 Gemma l'ha **scritto da sola** dalla descrizione e dall'esempio del passo 4; unico difetto, 3 righe vuote invece di 2.
 
-### 3c. Il verificatore: `scripts\verifica.py` (16/11/2026)
+### 3c. Il verificatore: `scripts\verifica.py` (15/11/2026)
 
 Il punto debole di Gemma è **giudicare il proprio lavoro** (dichiara "fatto" o "non sono in loop" contro i fatti). Per renderla più autonoma il giudizio lo dà un programma:
 
@@ -222,9 +222,9 @@ Prossimi gradini di autonomia: (1) codice da copiare, (2) descrizione con esempi
 
 ### 4b. Costo e modo di lavorare con Claude
 
-I token di Gemma sono gratuiti (girano sulla GPU), ma **non riducono quelli di Claude**: con prompt che contengono il codice completo, una verifica di Claude a ogni passo e una conversazione lunga, Claude consuma più che a scrivere il modulo da solo. Per `converti`, il 15-16/11/2026, il costo è stato più alto.
+I token di Gemma sono gratuiti (girano sulla GPU), ma **non riducono quelli di Claude**: con prompt che contengono il codice completo, una verifica di Claude a ogni passo e una conversazione lunga, Claude consuma più che a scrivere il modulo da solo. Per `converti`, il 15/11/2026, il costo è stato più alto.
 
-Scelta dello sviluppatore (16/11/2026): **per ora conta imparare, non risparmiare**. Si lavora verificando insieme gli output a ogni passo e migliorando insieme il modo di usare l'AI locale.
+Scelta dello sviluppatore (15/11/2026): **per ora conta imparare, non risparmiare**. Si lavora verificando insieme gli output a ogni passo e migliorando insieme il modo di usare l'AI locale.
 
 Quando servirà risparmiare:
 - prompt di **specifica** (firma, esempi, errori, test attesi) invece che di codice;
@@ -251,7 +251,7 @@ Aggiunte il 15/11/2026: valgono per ogni attività, senza ripeterle nei prompt (
 
 ```
 - Crea e modifica i file SOLO con gli strumenti dell'editor di Cline, mai con comandi del terminale.
-- Nei file esistenti fai modifiche piccole con replace_in_file; non riscrivere mai un file intero.
+- Nei file esistenti fai modifiche piccole con `editor`; non riscrivere mai un file intero.
 - Usa il terminale solo per eseguire i test e il programma, non per scrivere file.
 - Se lo stesso comando o la stessa modifica fallisce 2 volte, fermati e mostra l'errore.
 - Non dire che una cosa funziona se non hai mostrato l'output di pytest.
