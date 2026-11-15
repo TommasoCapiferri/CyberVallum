@@ -97,6 +97,15 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 - Git 2.56 e GitHub CLI installati. Repository pubblico: https://github.com/TommasoCapiferri/CyberVallum (ramo `main`). Dopo ogni commit: `git push`.
 - AI locale: Ollama 0.40.16, in ascolto solo su 127.0.0.1. Modello **`gemma4:12b-it-qat`** (7,2 GB) scaricato il 15/11: gira al 100% sulla GPU RTX 5070 a circa 68-71 token/s anche con contesto da 64k (7,7 GB occupati). Contesto predefinito impostato con `OLLAMA_CONTEXT_LENGTH=65536` (variabile d'ambiente dell'utente). Cline installato in VS Code e collegato a Ollama (provider Ollama, modello `gemma4:12b-it-qat`, contesto 65536, timeout 300000 ms); prima prova superata il 15/11 (Gemma riassume correttamente progetto, primo modulo, regole dei test e dei commit; trascura i mock e `--json`).
 
+## Da dove ripartire (to-do)
+> Aggiornare questa sezione alla fine di ogni sessione. Alla domanda "cosa bisogna fare?" si risponde da qui.
+
+1. **Ora:** modulo `converti`, giro 2, **messaggio D** (passo 6, test della CLI) da [docs/prompts/converti-giro2.md](docs/prompts/converti-giro2.md). Task nuovo in Cline, modalità Act. Prima: `.venv\Scripts\python scripts\verifica.py` deve dare `VERIFICA: OK` e 91 passed; dopo: 96 passed. Claude controlla il diff.
+2. **Poi:** messaggio E (passo 7, `docs/json.md`), nello stesso task del D.
+3. **Poi:** revisione di Claude del giro 2, README ("Cosa può fare oggi": comandi `converti`), commit `[claude]` e push. Modulo `converti` ✅.
+4. **Poi:** modulo `processi` con Gemma al gradino 3 di autonomia (solo firme, campi JSON e risultati attesi; vedi `docs/ai-locale.md`, sezione 3c).
+5. **Da provare, senza fretta:** variante di Gemma con `temperature` più bassa, confrontata sullo stesso passo.
+
 ## Prossimi passi
 1. ✅ **[claude] Base del progetto:** `pyproject.toml` (Python 3.12, dipendenze `psutil`, `typer`, `pytest`), pacchetto `cybervallum/` con `core/config.py` (impostazioni in `config.toml`, validazione, `list/get/set`), `core/registry.py` (registrazione delle azioni `<modulo>.<azione>` con parametri e flag `modifica_sistema`, avvio unico che restituisce un dizionario), `cli.py` con i comandi `config`, `check list`, `check run … --json`, `test run … --json`; cartella `tests/` con i test di config e registry. Commit `[claude]`.
 2. **[claude] Istruzioni per Cline:** un prompt pronto da incollare per il modulo `sistema`: funzioni del core dietro piccoli adattatori di `psutil`/`platform` sostituibili nei test, registrazione nel registro, comando `cybervallum sistema info --json`, test con mock. Ricordare a Gemma mock e `--json`, che nel riassunto aveva trascurato.
