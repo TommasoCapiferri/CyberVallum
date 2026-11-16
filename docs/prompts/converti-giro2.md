@@ -2,7 +2,7 @@
 
 Prompt preparati da Claude il 15/11/2026 e provati prima su una copia del progetto (96 test superati alla fine). Si incollano in Cline, modalità **Act**, uno alla volta; dopo ogni messaggio si controlla che i risultati corrispondano a quelli attesi.
 
-Stato: messaggi A (passi 1-2), B (passo 3) e C (passi 4-5, commit `eadee4a`) **fatti**. Restano D ed E. Dal messaggio D i controlli usano anche `scripts\verifica.py`.
+Stato: **giro completato il 16/11/2026**. Messaggi A (passi 1-2), B (passo 3), C (passi 4-5, `eadee4a`), D (passo 6, `d625833`) ed E (passo 7, `b0954ae`). Dal messaggio D i controlli usano anche `scripts\verifica.py`.
 
 Come sono scritti (vedi [../ai-locale.md](../ai-locale.md)): ogni modifica a un file esistente è "TESTO VECCHIO = una riga corta e unica, TESTO NUOVO = la stessa riga più le aggiunte"; i segnaposto `# STEP-...` rendono unico il punto da sostituire; ogni passo ha controlli con il risultato atteso.
 

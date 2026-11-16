@@ -198,6 +198,8 @@ Lezioni:
 
 Esito del messaggio C riscritto (autosufficiente): passi 4 e 5 corretti al primo colpo. Il passo 5 Gemma l'ha **scritto da sola** dalla descrizione e dall'esempio del passo 4; unico difetto, 3 righe vuote invece di 2.
 
+Messaggi D ed E (16/11/2026), nello stesso task di Cline: **corretti al primo colpo**, diff identici a quelli chiesti. Primi passi con il verificatore: Gemma l'ha eseguito prima e dopo, come chiedeva il prompt, e i suoi riassunti corrispondevano ai fatti. Giro 2 completo: 7 passi, un solo tentativo fallito (il messaggio C senza contesto), 96 test.
+
 ### 3c. Il verificatore: `scripts\verifica.py` (15/11/2026)
 
 Il punto debole di Gemma è **giudicare il proprio lavoro** (dichiara "fatto" o "non sono in loop" contro i fatti). Per renderla più autonoma il giudizio lo dà un programma:
