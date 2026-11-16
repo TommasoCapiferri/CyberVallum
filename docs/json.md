@@ -66,6 +66,17 @@ Lo producono `sistema info --json` e `check run sistema.info --json`. Azione in 
 - I dischi che non si possono leggere (per esempio un lettore CD vuoto) non compaiono nell'elenco.
 - `cpu.modello` viene da `platform.processor()`: su Windows è la sigla tecnica (es. "AMD64 Family 25 Model 33..."), non il nome commerciale.
 
+### `dati` delle azioni `converti.*`
+
+Le producono `converti numero|ip|mac --json` e `check run converti.<azione> --json`. Azioni in sola lettura; un input non valido dà `stato` = `errore` con il messaggio in italiano.
+
+- `converti.numero` (parametro `valore`: `255`, `0xFF` o `0b1010`, intero non negativo):
+  `{"input": "0xFF", "decimale": 255, "binario": "11111111", "esadecimale": "FF", "bit": 8}`
+- `converti.ip` (parametro `indirizzo`, solo IPv4):
+  `{"indirizzo": "192.168.1.10", "intero": 3232235786, "binario": "11000000.10101000.00000001.00001010", "esadecimale": "C0.A8.01.0A", "privato": true}`
+- `converti.mac` (parametro `indirizzo`, formati `00:1A:2B:3C:4D:5E`, `00-1a-2b-3c-4d-5e`, `001A.2B3C.4D5E`):
+  `{"mac": "00:1A:2B:3C:4D:5E", "binario": "00000000:00011010:...", "oui": "00:1A:2B", "unicast": true, "amministrato_localmente": false}`
+
 ## Elenco delle azioni: `check list --json`
 
 ```json
