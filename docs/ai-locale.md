@@ -215,6 +215,37 @@ Avrebbe scoperto da solo: i doppioni del messaggio C, `sistema_app` mai creato n
 
 Prossimi gradini di autonomia: (1) codice da copiare, (2) descrizione con esempio (passo 5 di `converti`), (3) solo firme, campi JSON e risultati attesi (modulo `processi`), (4) solo obiettivo e controlli, con piano in modalità Plan rivisto da Claude. Da provare per ultimo: una variante del modello con `temperature` più bassa (ora è 1), confrontata sullo stesso passo.
 
+### 3d. L'area dell'AI locale (16/11/2026)
+
+Lavorare passo passo con Gemma rallentava il progetto. Dal 16/11 il progetto è diviso (regole complete in `PROGETTO.md`, sezione "Area dell'AI locale"):
+- **Gemma** ha un'area sua: moduli isolati e in sola lettura, sviluppati senza fretta, per imparare a usarla e ottimizzarla;
+- **Claude e lo sviluppatore** portano avanti il resto su `main`, senza aspettare Gemma.
+
+Cosa la rende possibile, nel codice:
+- **un modulo è fatto solo di file suoi** (`core/<m>.py`, `comandi/<m>.py`, `tests/test_<m>.py`, `docs/moduli/<m>.md`): Gemma non tocca più `cli.py`, `registry.py` o `docs/json.md`, i file che rompeva di più;
+- **`verifica.py --area <m>`** blocca i file fuori area e il codice che modifica il sistema o usa la rete;
+- **`tests/test_architettura.py`** controlla che il modulo sia completo.
+
+**La seconda cartella (git worktree).** Un worktree è una seconda cartella dello stesso repository, con un altro ramo aperto: stessa storia, file separati. Così Gemma lavora nella sua cartella mentre noi lavoriamo su `main` nella principale.
+
+```
+# dalla cartella CyberVallum (una volta per modulo)
+git worktree add -b locale/processi ..\CyberVallum-locale main   # crea cartella e ramo, partendo da main
+cd ..\CyberVallum-locale
+py -3.12 -m venv .venv                                              # ogni cartella ha il suo ambiente
+.venv\Scripts\python -m pip install -e .[dev]
+.venv\Scripts\python scripts\verifica.py --area processi            # atteso: VERIFICA: OK
+```
+
+Poi in VS Code: *File → Open Folder* → `CyberVallum-locale`, e lì si apre Cline (che legge lo stesso `.clinerules`). Attenzione: `pip install -e` collega il comando `vallum` della cartella in cui lo si lancia, quindi ogni cartella usa il **suo** `.venv\Scripts\vallum`.
+
+A fine modulo (lo fa Claude, dalla cartella principale):
+```
+git merge --no-ff locale/processi        # unisce il ramo a main, lasciando visibile il lavoro di Gemma
+git worktree remove ..\CyberVallum-locale
+git branch -d locale/processi
+```
+
 ### 4. Quando si incastra
 
 - **Fermarla subito** al primo loop: lasciarla riprovare peggiora i file.

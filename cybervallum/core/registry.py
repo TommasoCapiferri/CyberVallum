@@ -13,6 +13,7 @@ in dry-run mode by default and really changes the system only when the caller pa
 from __future__ import annotations
 
 import importlib
+import pkgutil
 import re
 import subprocess
 import sys
@@ -25,17 +26,24 @@ from typing import Any, Callable
 
 from cybervallum.core.convert import ConversionError, to_type, type_name
 
-# Core modules that register actions on import. New modules are added here.
-BUILTIN_MODULES: list[str] = [
-    "cybervallum.core.config",
-    "cybervallum.core.sistema",
-    "cybervallum.core.converti",
-]
+# Files of cybervallum/core/ that are infrastructure, not modules with actions.
+# Every other file of cybervallum/core/ is a module and is imported automatically
+# (see discover_modules): adding a module never touches this file.
+INFRASTRUCTURE_MODULES = frozenset({"registry", "convert"})
 
 # Project root (the folder that contains `cybervallum/` and `tests/`).
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 _NAME_RE = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
+_SUITE_RE = re.compile(r"^[a-z][a-z0-9_]*$")
+
+
+def discover_modules() -> list[str]:
+    """Return the import names of the core modules that register actions, sorted."""
+    package = importlib.import_module("cybervallum.core")
+    names = sorted(info.name for info in pkgutil.iter_modules(package.__path__))
+    return [f"cybervallum.core.{n}" for n in names
+            if not n.startswith("_") and n not in INFRASTRUCTURE_MODULES]
 
 
 class RegistryError(Exception):
@@ -288,19 +296,37 @@ class Registry:
     # Module loading -----------------------------------------------------------------
 
     def load_modules(self, modules: list[str] | None = None) -> None:
-        """Import the core modules so that they register their actions (idempotent)."""
-        for module in modules if modules is not None else BUILTIN_MODULES:
+        """Import the core modules so that they register their actions (idempotent).
+
+        Without an explicit list, every module of cybervallum/core/ is imported and every
+        tests/test_<name>.py without a suite gets the suite <name>.
+        """
+        for module in modules if modules is not None else discover_modules():
             importlib.import_module(module)
+        if modules is None:
+            self.discover_suites()
+
+    def discover_suites(self) -> None:
+        """Register a suite for every tests/test_<name>.py that does not have one yet."""
+        tests_dir = self.project_root / "tests"
+        if not tests_dir.is_dir():
+            return
+        for path in sorted(tests_dir.glob("test_*.py")):
+            name = path.stem.removeprefix("test_")
+            if _SUITE_RE.match(name) and name not in self._suites:
+                self.add_suite(name, f"Test del modulo {name}", [f"tests/{path.name}"])
 
 
-# Default registry used by the whole application.
+# Default registry used by the whole application. Shared suites have an explicit
+# description; the suite of each module is found by discover_suites().
 default_registry = Registry()
 default_registry.add_suite("tutti", "Tutti i test del progetto", ["tests"])
 default_registry.add_suite("config", "Test delle impostazioni", ["tests/test_config.py"])
 default_registry.add_suite("registry", "Test del registro", ["tests/test_registry.py"])
 default_registry.add_suite("cli", "Test della riga di comando", ["tests/test_cli.py"])
-default_registry.add_suite("sistema", "Test del modulo sistema", ["tests/test_sistema.py"])
-default_registry.add_suite("converti", "Test del modulo converti", ["tests/test_converti.py"])
+default_registry.add_suite("architettura", "Test dell'architettura: moduli completi e separati",
+                           ["tests/test_architettura.py"])
+default_registry.add_suite("verifica", "Test del verificatore (scripts/verifica.py)", ["tests/test_verifica.py"])
 
 action = default_registry.action
 add_suite = default_registry.add_suite

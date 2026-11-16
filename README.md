@@ -15,6 +15,7 @@ Non è un prodotto finito né un software destinato all'uso professionale: è un
 | Comando | Funzione |
 |---|---|
 | `vallum sistema info` | Sistema operativo, CPU (modello, core, frequenza, utilizzo), memoria, dischi e ultimo avvio |
+| `vallum converti numero\|ip\|mac` | Conversione dei numeri tra decimale, binario ed esadecimale; indirizzi IPv4 in binario, esadecimale e come intero, con indicazione di indirizzo privato o pubblico; indirizzi MAC con OUI (produttore), tipo unicast o multicast e amministrazione universale o locale |
 | `vallum config list\|get\|set` | Lettura e modifica delle impostazioni, con validazione dei valori |
 | `vallum check list\|run` | Elenco ed esecuzione dei controlli registrati |
 | `vallum test list\|run` | Elenco ed esecuzione delle suite di test, con esito strutturato |
@@ -25,18 +26,17 @@ Installazione per lo sviluppo (Python 3.12):
 
 ```
 py -3.12 -m venv .venv
-.venv\Scripts\python -m pip install -e .
+.venv\Scripts\python -m pip install -e .[dev]
 ```
 
 ## In sviluppo
 | Modulo | Funzione |
 |---|---|
-| `converti` | Conversioni tra binario, decimale ed esadecimale; rappresentazione degli indirizzi IP |
+| `processi` | Processi attivi e consumo di risorse |
 
 ## Obiettivi
 | Modulo | Funzione |
 |---|---|
-| `processi` | Processi attivi e consumo di risorse |
 | `diagnosi` | Diagnosi della connettività: interfaccia di rete, gateway, Internet, DNS |
 | `lan` | Rilevamento dei dispositivi della rete locale, calcolo delle sottoreti |
 | `voip` | Analisi delle chiamate SIP/RTP da catture di rete |

@@ -14,8 +14,11 @@ Il nome viene dal latino *vallum*, il terrapieno difensivo degli accampamenti ro
  ├── core/        ← il "motore": funzioni Python pure, una per modulo (sistema, processi, rete…)
  │                  restituiscono dati (dizionari/oggetti), NON stampano nulla
  │   ├── config.py    ← UNICO punto per leggere, validare e salvare le impostazioni
- │   └── registry.py  ← elenco dei controlli e dei test eseguibili, con un solo punto di avvio
- ├── cli.py       ← comando da terminale (Typer): `cybervallum <modulo> <azione>` (abbreviato: `vallum`)
+ │   └── registry.py  ← elenco dei controlli e dei test eseguibili, con un solo punto di avvio;
+ │                      trova da solo i moduli di core/ e le suite tests/test_<modulo>.py
+ ├── comandi/     ← i comandi della CLI, un file per modulo (`comandi/<modulo>.py`, con il suo `app` Typer)
+ ├── cli.py       ← comando da terminale (Typer): `cybervallum <modulo> <azione>` (abbreviato: `vallum`);
+ │                  contiene solo i gruppi comuni config/check/test e aggancia da solo comandi/
  ├── api/         ← (più avanti) API REST locale (FastAPI) sopra lo stesso core
  ├── gui/         ← (più avanti) interfaccia desktop sopra lo stesso core
  └── ai/          ← (più avanti) assistente AI intercambiabile:
@@ -27,15 +30,16 @@ Il nome viene dal latino *vallum*, il terrapieno difensivo degli accampamenti ro
 - **Prima il core e la CLI**, poi l'API e la GUI sopra lo stesso core.
 - **Un solo motore, tre ingressi:** CLI, API e GUI non contengono logica. Chiamano `core.config` per le impostazioni e `core.registry` per avviare controlli e test, e restituiscono lo stesso JSON.
 
-### Come si aggiunge un modulo (es. `sistema`)
-1. File `cybervallum/core/<modulo>.py`. Le chiamate al sistema (`psutil`, `platform`, comandi) stanno in piccole funzioni private (`_read_cpu()`, ...) che i test sostituiscono con `monkeypatch`. Le funzioni pubbliche restituiscono dizionari e non stampano.
-2. Si registrano le azioni con `@registry.action("<modulo>.<azione>", "descrizione", params={...}, modifica_sistema=False)`. Le azioni con `modifica_sistema=True` ricevono il parametro `dry_run` dal registro.
-3. Si aggiunge `"cybervallum.core.<modulo>"` a `BUILTIN_MODULES` in `core/registry.py` e una suite con `default_registry.add_suite(...)`.
-4. In `cli.py` si aggiunge un gruppo di comandi che chiama solo `registry.run(...)` e `_finish(...)`, con l'opzione `--json`.
-5. Si scrive `tests/test_<modulo>.py` con i mock e si documenta il formato di `dati` in `docs/json.md`.
-6. Per eventuali impostazioni del modulo si usa `config.register_setting(Setting(...))`. Mai leggere file o variabili d'ambiente direttamente.
+### Come si aggiunge un modulo (es. `sistema`) — dal 16/11/2026 solo con file nuovi
+Un modulo è fatto di **quattro file suoi**, e non tocca nessun file comune (né `registry.py`, né `cli.py`, né `docs/json.md`):
+1. `cybervallum/core/<modulo>.py`: le chiamate al sistema (`psutil`, `platform`, comandi) stanno in piccole funzioni private (`_read_cpu()`, ...) che i test sostituiscono con `monkeypatch`; le funzioni pubbliche restituiscono dizionari e non stampano. Le azioni si registrano con `@registry.action("<modulo>.<azione>", "descrizione", params={...}, modifica_sistema=False)`; quelle con `modifica_sistema=True` ricevono `dry_run` dal registro. Il registro trova il file da solo.
+2. `cybervallum/comandi/<modulo>.py`: `app = typer.Typer(help=..., no_args_is_help=True)` e i comandi, che chiamano solo `registry.run(...)` e `finish(...)` di `comandi/_comune.py`, con l'opzione `JsonOpt` (`--json`). `cli.py` lo aggancia da solo con il nome del file.
+3. `tests/test_<modulo>.py`: test con i mock; la suite `<modulo>` nasce da sola.
+4. `docs/moduli/<modulo>.md`: comandi, parametri e formato di `dati` (modello: `docs/moduli/converti.md`).
 
-**Ambiente di sviluppo:** `py -3.12 -m venv .venv`, poi `.venv\Scripts\python -m pip install -e .[dev]` e `.venv\Scripts\python -m pytest`. **Verifica completa** (ruff, segnaposto, file di copia, BOM, pytest): `.venv\Scripts\python scripts\verifica.py`, che deve stampare `VERIFICA: OK` prima di ogni commit. Il formato `--json` è documentato in `docs/json.md`.
+`tests/test_architettura.py` controlla che ogni modulo abbia tutti e quattro i file e che le sue azioni si chiamino `<modulo>.*`. Per le impostazioni del modulo si usa `config.register_setting(Setting(...))`: mai leggere file o variabili d'ambiente direttamente. Dopo, Claude aggiunge il modulo all'elenco di `docs/json.md` e al README.
+
+**Ambiente di sviluppo:** `py -3.12 -m venv .venv`, poi `.venv\Scripts\python -m pip install -e .[dev]` e `.venv\Scripts\python -m pytest`. **Verifica completa** (ruff, segnaposto, file di copia, BOM, pytest): `.venv\Scripts\python scripts\verifica.py`, che deve stampare `VERIFICA: OK` prima di ogni commit; sul ramo dell'AI locale si aggiunge `--area <modulo>`. Il formato `--json` è documentato in `docs/json.md`.
 
 ## Il README
 Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **Cosa può fare oggi** (moduli funzionanti), **In sviluppo** (il modulo su cui si sta lavorando) e **Obiettivi** (moduli futuri). Deve restare chiaro che è un **progetto personale per esercitarsi con l'AI**.
@@ -49,7 +53,7 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 4. **Ogni modulo ha il suo test.**
 5. Codice e commenti in **inglese**, messaggi all'utente in **italiano**.
 6. **Commit con prefisso:** `[locale]` se il lavoro l'ha fatto l'AI locale, `[claude]` se l'ha fatto Claude Code, `[io]` se l'ha fatto lo sviluppatore.
-7. **Una AI alla volta**, e un commit prima di passare all'altra. (Quando sarà pronta l'"Area dell'AI locale", qui sotto, diventerà **una AI per area**.)
+7. **Una AI per area** (dal 16/11/2026, vedi "Area dell'AI locale"): l'AI locale lavora solo nel suo ramo `locale/<modulo>` e nella sua cartella `..\CyberVallum-locale`; Claude e lo sviluppatore su `main` nella cartella principale. Nella stessa cartella e nello stesso ramo vale ancora **una AI alla volta**, con un commit prima di passare all'altra.
 8. **Testabilità fin dall'inizio:**
    - il **core** non stampa e non legge input: restituisce dati. Le chiamate al sistema (psutil, comandi di rete) stanno dietro piccole funzioni che si possono **sostituire nei test** (mock), così i test non dipendono dal PC su cui girano;
    - ogni comando della CLI ha l'opzione **`--json`**, con un output stabile e documentato;
@@ -71,27 +75,30 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
     - nessuna telemetria: le richieste verso le fonti non inviano dati sul PC o sulla rete dello sviluppatore; si rispettano le condizioni d'uso e i limiti di frequenza di ogni fonte (chiavi API nel `.env`);
     - i moduli (`sicurezza`, `lan`, `ai`…) leggono questi dati solo tramite il core, per esempio per segnalare un software installato con vulnerabilità note o una connessione verso un indirizzo segnalato.
 
-## Area dell'AI locale (idea approvata il 2026-11-16, da applicare)
+## Area dell'AI locale (approvata e applicata il 2026-11-16)
 **Perché:** lavorare passo passo con Gemma rallenta il progetto. Il progetto si divide in due:
 - **l'area dell'AI locale**: alcuni moduli dati a Gemma per capire come funziona, come ottimizzarla e impararla, senza fretta (gli episodi vanno nello studio `..\Studio-AI-Locale`);
 - **il resto**, che sviluppiamo lo sviluppatore e Claude Code: così il progetto avanza indipendente da Gemma.
 
-**Prima idea di come applicarla** (da discutere prima di scrivere codice):
-1. **Un modulo = solo i suoi file.** Oggi un modulo nuovo tocca file in comune (`BUILTIN_MODULES` in `registry.py`, `cli.py`, `docs/json.md`), proprio quelli che Gemma rompe più spesso. Si cambia l'architettura (lavoro di Claude):
-   - il registro trova da solo i moduli in `cybervallum/core/` e ogni modulo registra la sua suite di test;
-   - i comandi di ogni modulo stanno in un file suo (per esempio `cybervallum/comandi/<modulo>.py` con il suo `app` Typer), che `cli.py` aggancia da solo;
-   - la documentazione del formato `dati` di ogni modulo va in un file suo (`docs/moduli/<modulo>.md`), e `docs/json.md` tiene solo le parti comuni.
-   Così un modulo di Gemma è fatto solo di file nuovi: `core/<modulo>.py`, `comandi/<modulo>.py`, `tests/test_<modulo>.py`, `docs/moduli/<modulo>.md`.
-2. **Gemma lavora su un ramo suo**, `locale/<modulo>`, in una **seconda cartella** (`git worktree`, per esempio `..\CyberVallum-locale`, con il suo `.venv`), aperta in VS Code per Cline. Così Claude e lo sviluppatore lavorano su `main` nella cartella principale senza disturbarsi. Quando il modulo è pronto e il verificatore dà OK, Claude lo rivede e lo unisce a `main` (`git merge --no-ff`, così nella storia si vede il lavoro di Gemma); se esce male il ramo si butta.
-3. **Il verificatore controlla anche l'area**: per esempio `verifica.py --area <modulo>` fallisce se sul ramo sono cambiati file fuori dai quattro del modulo. È un blocco tecnico, non solo una regola scritta.
-4. **Regole fisse dell'area:**
+**Come funziona:**
+1. **Un modulo = solo i suoi file** (fatto il 16/11): il registro trova da solo i moduli e le suite, i comandi stanno in `cybervallum/comandi/<modulo>.py`, la documentazione in `docs/moduli/<modulo>.md` (vedi "Come si aggiunge un modulo"). Un modulo di Gemma è fatto solo di file nuovi: `core/<modulo>.py`, `comandi/<modulo>.py`, `tests/test_<modulo>.py`, `docs/moduli/<modulo>.md`. `tests/test_architettura.py` controlla che ci siano tutti.
+2. **Gemma lavora su un ramo suo**, `locale/<modulo>`, in una **seconda cartella** (`git worktree`: `..\CyberVallum-locale`, con il suo `.venv`), aperta in VS Code per Cline. Così Claude e lo sviluppatore lavorano su `main` nella cartella principale senza disturbarsi. Comandi in `docs/ai-locale.md`, sezione "Area dell'AI locale".
+3. **Il verificatore controlla l'area** (fatto il 16/11): `verifica.py --area <modulo>` fallisce se rispetto a `main` sono cambiati file fuori dai quattro del modulo, e se il codice dell'area contiene `modifica_sistema=True`, import di rete, di `subprocess` o di `shutil`, oppure chiamate come `kill`, `terminate`, `os.system`, `write_text`. È un blocco tecnico, non solo una regola scritta (test in `tests/test_verifica.py`).
+4. **Revisione e unione:** Claude rivede **a fine modulo** (diff completo del ramo, verificatore, prova dei comandi). Su richiesta di Gemma o dello sviluppatore, anche a metà. Se va bene, lo unisce a `main` con `git merge --no-ff`, così nella storia resta visibile il lavoro di Gemma; se esce male, il ramo si butta senza toccare `main`. Dopo l'unione il modulo appartiene a `main`: Claude ci aggiunge le parti fuori area (per esempio la chiusura dei processi), l'elenco in `docs/json.md` e il README.
+5. **Regole fisse dell'area:**
    - solo moduli **isolati, in sola lettura, con una specifica chiara**;
    - **mai** azioni con `modifica_sistema=True`, codice che fa traffico di rete o nuove dipendenze (queste restano a Claude: le regole 1 e 2 sono troppo importanti);
    - Gemma non tocca i file comuni: `core/config.py`, `core/registry.py`, `cli.py`, `scripts/verifica.py`, `pyproject.toml`, `.clinerules`, `PROGETTO.md`, `README.md`.
-5. **Moduli proposti per l'area:** `processi` (solo la parte in lettura: elenco, ordinamento, ricerca; la chiusura dei processi la fa Claude), il calcolatore di subnet di `lan` (funzioni pure), estensioni di moduli esistenti (altre conversioni). A Claude: core, `diagnosi`, `sicurezza`, `aggiornamenti`, `api`, `gui`, e tutto ciò che modifica il sistema o tocca la rete.
-6. **Costo:** con moduli interi al gradino 3-4 dell'autonomia, Claude rivede solo a fine modulo, non a ogni passo.
+6. **Moduli dell'area:**
 
-**Domande aperte:** l'elenco dei moduli di Gemma; se Claude rivede a fine modulo o anche a metà; se il worktree serve subito o basta il ramo nella stessa cartella (più semplice, ma allora vale ancora "una AI alla volta").
+   | Modulo | Parte di Gemma | Stato |
+   |---|---|---|
+   | `processi` | elenco, ordinamento per RAM/CPU, ricerca (la chiusura la fa Claude dopo l'unione) | ⬜ primo lavoro, ramo `locale/processi` |
+   | `subnet` | calcolatore di sottoreti (funzioni pure; il resto di `lan`, con l'ARP, è di Claude) | ⬜ |
+   | estensioni | altre conversioni o funzioni pure di moduli esistenti, in un modulo nuovo | ⬜ |
+
+   A Claude: il core, `diagnosi`, `lan` (parte di rete), `sicurezza`, `aggiornamenti`, `api`, `gui`, e tutto ciò che modifica il sistema o tocca la rete.
+7. **Costo:** con moduli interi al gradino 3-4 dell'autonomia, Claude rivede solo a fine modulo, non a ogni passo.
 
 ## Roadmap (collegata al percorso di studio)
 | Modulo | Collegato a | Funzioni | Stato |
@@ -122,10 +129,15 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 ## Da dove ripartire (to-do)
 > Aggiornare questa sezione alla fine di ogni sessione. Alla domanda "cosa bisogna fare?" si risponde da qui.
 
-1. **Ora:** README con i comandi `converti` tra le funzionalità disponibili (proposta di Claude, serve l'ok dello sviluppatore). Il modulo `converti` è finito (giro 2 completo il 16/11, 96 test).
-2. **Poi:** **Area dell'AI locale** (sezione sopra): rispondere alle domande aperte, poi Claude fa la separazione nel codice (moduli trovati da soli, comandi e documentazione per modulo, `verifica.py --area`).
-3. **Poi:** modulo `processi` (parte in lettura) come primo lavoro di Gemma nella sua area, sul ramo `locale/processi`, al gradino 3 di autonomia (vedi `docs/ai-locale.md`, sezione 3c). In parallelo noi andiamo avanti su `main` con un altro modulo.
-4. **Da provare, senza fretta:** variante di Gemma con `temperature` più bassa, confrontata sullo stesso passo.
+Dal 16/11 ci sono due binari indipendenti (vedi "Area dell'AI locale"):
+
+**Area dell'AI locale (Gemma, cartella `..\CyberVallum-locale`):**
+1. **Ora:** modulo `processi` (elenco, ordinamento, ricerca) sul ramo `locale/processi`, al gradino 3 di autonomia (solo firme, campi JSON e risultati attesi; vedi `docs/ai-locale.md`, sezione 3c). Claude prepara la cartella (worktree) e il prompt in `docs/prompts/processi.md`.
+2. **Da provare, senza fretta:** variante di Gemma con `temperature` più bassa, confrontata sullo stesso passo.
+
+**Progetto principale (Claude e lo sviluppatore, su `main`):**
+1. **Ora:** scegliere il prossimo modulo. Proposta: `diagnosi` (L4 · Comandi di rete: scala scheda → IP → gateway → Internet → DNS), che è di Claude perché fa traffico di rete.
+2. **Quando Gemma finisce `processi`:** revisione, unione con `git merge --no-ff`, poi la chiusura dei processi con conferma (`modifica_sistema=True`), l'elenco in `docs/json.md` e il README.
 
 ## Prossimi passi
 1. ✅ **[claude] Base del progetto:** `pyproject.toml` (Python 3.12, dipendenze `psutil`, `typer`, `pytest`), pacchetto `cybervallum/` con `core/config.py` (impostazioni in `config.toml`, validazione, `list/get/set`), `core/registry.py` (registrazione delle azioni `<modulo>.<azione>` con parametri e flag `modifica_sistema`, avvio unico che restituisce un dizionario), `cli.py` con i comandi `config`, `check list`, `check run … --json`, `test run … --json`; cartella `tests/` con i test di config e registry. Commit `[claude]`.
@@ -136,7 +148,8 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 6. ✅ **PowerShell 7.7 terminale predefinito di VS Code** (15/11/2026). Note originali: PowerShell 7.7 è già installato (pacchetto MSIX via winget, comando `pwsh`). Da fare: chiudere e riaprire completamente VS Code, poi Ctrl+Shift+P → *Terminal: Select Default Profile* → la voce con `pwsh.exe` nel percorso (non `powershell.exe`, che è la 5.1). Se non compare, aggiungere un profilo che punta a `C:\Users\tomma\AppData\Local\Microsoft\WindowsApps\pwsh.exe`. Verificare con `$PSVersionTable.PSVersion` (7.7.0). Poi in Cline: *Default Terminal Profile* = PowerShell 7, lasciando *Background Exec*, e rifare la prova dei due `py_compile` (file corretto -> exit code 0, file inesistente -> 1).
 7. ✅ **[locale] Modulo `converti`, giro 1:** `core/converti.py` (`numero`, `ip`, `mac` e le azioni `converti.*`) e `tests/test_converti.py`, scritti da Gemma in 9 passi (commit `c41dae9`, `598a9e6`) e rivisti da Claude.
 8. ✅ **[locale] Modulo `converti`, giro 2 (fatto il 16/11):** `"cybervallum.core.converti"` in `BUILTIN_MODULES` e suite `converti` in `registry.py`; comandi `vallum converti numero|ip|mac [--json]` in `cli.py`; sezione `dati` di `converti.*` in `docs/json.md`. Tutti e 7 i passi fatti e verificati (96 test); prompt in `docs/prompts/converti-giro2.md`.
-9. ✅ **[claude] Revisione del giro 2** (16/11: diff conformi, esempi di `docs/json.md` uguali all'output reale); da fare l'aggiornamento del README (comandi `converti` tra le funzionalità disponibili).
+9. ✅ **[claude] Revisione del giro 2** (16/11: diff conformi, esempi di `docs/json.md` uguali all'output reale) e README aggiornato.
+10. ✅ **[claude] Area dell'AI locale** (16/11): moduli fatti solo di file propri, `verifica.py --area`, test di architettura e del verificatore (121 test).
 
 ## Registro delle sessioni
 | Data | Chi | Cosa è stato fatto |
@@ -158,3 +171,4 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 | 2026-11-15 | [claude] | `.clinerules`: nomi veri degli strumenti (`read_files`, `editor`, `run_commands`; `replace_in_file` non esiste in questa versione), `PROGETTO.md` letto solo se serve (i prompt sono autosufficienti), tolto "mostra le modifiche prima di applicarle" (le modifiche sono in approvazione automatica: si controlla il diff). Date "16/11" corrette in 15/11. Le lezioni sull'AI locale sono un progetto a parte: `..\Studio-AI-Locale` |
 | 2026-11-16 | [locale] | `converti`, giro 2: passi 6 (test della CLI) e 7 (docs), corretti al primo colpo; primi passi con il verificatore |
 | 2026-11-16 | [claude] | Revisione del giro 2: modulo `converti` completo. Idea approvata: "Area dell'AI locale" (sezione nuova), da applicare |
+| 2026-11-16 | [claude] | Area dell'AI locale applicata: il registro trova da solo moduli e suite (non serve più `BUILTIN_MODULES`), comandi in `cybervallum/comandi/<modulo>.py`, documentazione in `docs/moduli/<modulo>.md`, `verifica.py --area` (file fuori area, codice che modifica il sistema o usa la rete), `tests/test_architettura.py` e `tests/test_verifica.py`; regola 7 "una AI per area"; regole dell'area in `.clinerules`; README con `converti` e `processi` in sviluppo. 121 test |

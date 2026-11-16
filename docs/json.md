@@ -44,38 +44,14 @@ Le azioni con `modifica_sistema` sono simulate per impostazione predefinita. L'e
 - `config.get`: `{"chiave", "valore"}`
 - `config.set`: `{"chiave", "valore", "file"}`
 
-### `dati` di `sistema.info`
+### `dati` dei moduli
 
-Lo producono `sistema info --json` e `check run sistema.info --json`. Azione in sola lettura.
+Ogni modulo documenta comandi, parametri e formato di `dati` nella sua pagina, in [moduli/](moduli/):
 
-```json
-{
-  "sistema_operativo": { "nome": "Windows", "release": "11", "versione": "10.0.26200",
-                         "architettura": "AMD64", "nome_host": "PC" },
-  "cpu": { "modello": "...", "core_fisici": 8, "core_logici": 16,
-           "frequenza_mhz": 3600.0, "uso_percentuale": 12.5 },
-  "memoria": { "totale_byte": 34359738368, "disponibile_byte": 17179869184, "usata_percentuale": 50.0 },
-  "dischi": [ { "dispositivo": "C:\\", "punto_montaggio": "C:\\", "filesystem": "NTFS",
-                "totale_byte": 1000, "usato_byte": 400, "libero_byte": 600, "usato_percentuale": 40.0 } ],
-  "avvio": { "ultimo_avvio": "2026-11-15T08:00:00+00:00", "uptime_s": 3600 }
-}
-```
+- [`sistema`](moduli/sistema.md): `sistema.info`
+- [`converti`](moduli/converti.md): `converti.numero`, `converti.ip`, `converti.mac`
 
-- I byte sono interi, le percentuali numeri decimali, `ultimo_avvio` è una data ISO 8601 in UTC e `uptime_s` sono secondi interi.
-- Valgono `null` quando il sistema non li fornisce: le stringhe di `sistema_operativo`, `cpu.modello`, `cpu.core_fisici`, `cpu.frequenza_mhz` e `dischi[].filesystem`.
-- I dischi che non si possono leggere (per esempio un lettore CD vuoto) non compaiono nell'elenco.
-- `cpu.modello` viene da `platform.processor()`: su Windows è la sigla tecnica (es. "AMD64 Family 25 Model 33..."), non il nome commerciale.
-
-### `dati` delle azioni `converti.*`
-
-Le producono `converti numero|ip|mac --json` e `check run converti.<azione> --json`. Azioni in sola lettura; un input non valido dà `stato` = `errore` con il messaggio in italiano.
-
-- `converti.numero` (parametro `valore`: `255`, `0xFF` o `0b1010`, intero non negativo):
-  `{"input": "0xFF", "decimale": 255, "binario": "11111111", "esadecimale": "FF", "bit": 8}`
-- `converti.ip` (parametro `indirizzo`, solo IPv4):
-  `{"indirizzo": "192.168.1.10", "intero": 3232235786, "binario": "11000000.10101000.00000001.00001010", "esadecimale": "C0.A8.01.0A", "privato": true}`
-- `converti.mac` (parametro `indirizzo`, formati `00:1A:2B:3C:4D:5E`, `00-1a-2b-3c-4d-5e`, `001A.2B3C.4D5E`):
-  `{"mac": "00:1A:2B:3C:4D:5E", "binario": "00000000:00011010:...", "oui": "00:1A:2B", "unicast": true, "amministrato_localmente": false}`
+Un modulo nuovo aggiunge la sua pagina `docs/moduli/<modulo>.md` senza modificare questo file (il test `tests/test_architettura.py` controlla che ci sia); l'elenco qui sopra lo aggiorna Claude.
 
 ## Elenco delle azioni: `check list --json`
 

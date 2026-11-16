@@ -22,3 +22,9 @@
 - Non dire che una cosa funziona se non hai mostrato l'output di pytest.
 - Dopo ogni modifica esegui `.venv\Scripts\python scripts\verifica.py` (con `--con-segnaposto` solo se il prompt lo dice). Hai finito solo quando stampa `VERIFICA: OK`. Se segnala un errore, correggi SOLO quello; se lo stesso errore compare 2 volte, fermati e mostrami l'output.
 - Non fare mai git push.
+
+## La tua area (vedi "Area dell'AI locale" in `PROGETTO.md`)
+- Lavori su un modulo alla volta, nel ramo `locale/<modulo>` (nella cartella `CyberVallum-locale`). Non cambiare ramo e non unire rami: lo fa Claude.
+- Un modulo è fatto di QUATTRO file, e puoi creare o modificare SOLO questi: `cybervallum\core\<modulo>.py`, `cybervallum\comandi\<modulo>.py`, `tests\test_<modulo>.py`, `docs\moduli\<modulo>.md`. Tutti gli altri file del progetto sono comuni: leggili come esempio, non modificarli. Modelli da seguire: il modulo `converti` (gli stessi quattro file).
+- Nella tua area il verificatore si lancia così: `.venv\Scripts\python scripts\verifica.py --area <modulo>`. Hai finito solo con `VERIFICA: OK`.
+- Il tuo codice è in sola lettura: niente `modifica_sistema=True`, niente rete, niente `subprocess`, niente chiusura di processi o scrittura di file. Se il compito sembra richiederlo, FERMATI e chiedi: quella parte la scrive Claude.
