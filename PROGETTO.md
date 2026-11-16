@@ -123,10 +123,9 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 > Aggiornare questa sezione alla fine di ogni sessione. Alla domanda "cosa bisogna fare?" si risponde da qui.
 
 1. **Ora:** README con i comandi `converti` tra le funzionalità disponibili (proposta di Claude, serve l'ok dello sviluppatore). Il modulo `converti` è finito (giro 2 completo il 16/11, 96 test).
-2. **Poi:** rispondere alle domande aperte dell'**Area dell'AI locale**.
-3. **Poi:** **Area dell'AI locale** (sezione sopra): rispondere alle domande aperte, poi Claude fa la separazione nel codice (moduli trovati da soli, comandi e documentazione per modulo, `verifica.py --area`).
-4. **Poi:** modulo `processi` (parte in lettura) come primo lavoro di Gemma nella sua area, sul ramo `locale/processi`, al gradino 3 di autonomia (vedi `docs/ai-locale.md`, sezione 3c). In parallelo noi andiamo avanti su `main` con un altro modulo.
-5. **Da provare, senza fretta:** variante di Gemma con `temperature` più bassa, confrontata sullo stesso passo.
+2. **Poi:** **Area dell'AI locale** (sezione sopra): rispondere alle domande aperte, poi Claude fa la separazione nel codice (moduli trovati da soli, comandi e documentazione per modulo, `verifica.py --area`).
+3. **Poi:** modulo `processi` (parte in lettura) come primo lavoro di Gemma nella sua area, sul ramo `locale/processi`, al gradino 3 di autonomia (vedi `docs/ai-locale.md`, sezione 3c). In parallelo noi andiamo avanti su `main` con un altro modulo.
+4. **Da provare, senza fretta:** variante di Gemma con `temperature` più bassa, confrontata sullo stesso passo.
 
 ## Prossimi passi
 1. ✅ **[claude] Base del progetto:** `pyproject.toml` (Python 3.12, dipendenze `psutil`, `typer`, `pytest`), pacchetto `cybervallum/` con `core/config.py` (impostazioni in `config.toml`, validazione, `list/get/set`), `core/registry.py` (registrazione delle azioni `<modulo>.<azione>` con parametri e flag `modifica_sistema`, avvio unico che restituisce un dizionario), `cli.py` con i comandi `config`, `check list`, `check run … --json`, `test run … --json`; cartella `tests/` con i test di config e registry. Commit `[claude]`.
