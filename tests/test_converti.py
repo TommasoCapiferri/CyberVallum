@@ -1,7 +1,11 @@
 """Tests of the `converti` module: pure functions, no mocks needed."""
 
-import pytest
+import json
 
+import pytest
+from typer.testing import CliRunner
+
+from cybervallum import cli
 from cybervallum.core import converti, registry
 
 
@@ -64,6 +68,39 @@ def test_mac_multicast_e_locale():
 def test_mac_errore(indirizzo):
     with pytest.raises(ValueError):
         converti.mac(indirizzo)
+
+
+def test_cli_numero_json():
+    result = CliRunner().invoke(cli.app, ["converti", "numero", "0xFF", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    assert data["azione"] == "converti.numero"
+    assert data["dati"]["decimale"] == 255
+
+
+def test_cli_numero_testo():
+    result = CliRunner().invoke(cli.app, ["converti", "numero", "0xFF"])
+    assert result.exit_code == 0
+    assert "Binario: 11111111 (8 bit)" in result.stdout
+
+
+def test_cli_ip_errore():
+    result = CliRunner().invoke(cli.app, ["converti", "ip", "ciao", "--json"])
+    assert result.exit_code == 1
+    assert json.loads(result.stdout)["stato"] == "errore"
+
+
+def test_cli_mac_testo():
+    result = CliRunner().invoke(cli.app, ["converti", "mac", "02-00-00-00-00-01"])
+    assert result.exit_code == 0
+    assert "amministrato localmente" in result.stdout
+
+
+def test_cli_azioni_e_suite_registrate():
+    result = CliRunner().invoke(cli.app, ["check", "list", "--json"])
+    nomi = {a["nome"] for a in json.loads(result.stdout)["azioni"]}
+    assert {"converti.numero", "converti.ip", "converti.mac"} <= nomi
+    assert "converti" in {s["nome"] for s in registry.list_suites()}
 
 
 def test_registry_ok():
