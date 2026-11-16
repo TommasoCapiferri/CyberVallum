@@ -132,7 +132,7 @@ Il `README.md` ha tre sezioni da tenere aggiornate a ogni modulo completato: **C
 Dal 16/11 ci sono due binari indipendenti (vedi "Area dell'AI locale"):
 
 **Area dell'AI locale (Gemma, cartella `..\CyberVallum-locale`):**
-1. **Ora:** modulo `processi` (elenco, ordinamento, ricerca) sul ramo `locale/processi`, al gradino 3 di autonomia (solo firme, campi JSON e risultati attesi; vedi `docs/ai-locale.md`, sezione 3c). Claude prepara la cartella (worktree) e il prompt in `docs/prompts/processi.md`.
+1. **Ora:** modulo `processi` (elenco, ordinamento, ricerca) sul ramo `locale/processi`, al gradino 3 di autonomia (solo firme, campi JSON e risultati attesi; vedi `docs/ai-locale.md`, sezione 3c). Cartella e ramo pronti (16/11); prompt pronti e verificati in `docs/prompts/processi.md`: si parte dal **messaggio A** (scheletro dei quattro file), in un task nuovo di Cline aperto sulla cartella `CyberVallum-locale`.
 2. **Da provare, senza fretta:** variante di Gemma con `temperature` più bassa, confrontata sullo stesso passo.
 
 **Progetto principale (Claude e lo sviluppatore, su `main`):**
