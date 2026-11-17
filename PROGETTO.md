@@ -6,6 +6,7 @@
 ## Cos'è
 Un'app **da terminale e desktop**, per **Windows e Ubuntu**, che aiuta nella sistemistica, nella sicurezza e nel controllo della rete.
 Lo sviluppatore la costruisce mentre studia: **ogni capitolo del percorso di studio diventa un modulo**. Il percorso è in `..\Studio-Sistemista-CyberSecurity`.
+Il lato sistemistico e di sicurezza di ciò che fa l'app (sistema operativo, rete, macchine virtuali) si studia in `..\Studio-Castrum`, a lezioni e podcast, senza fermare lo sviluppo: quando qui succede qualcosa di istruttivo, Claude aggiunge una riga al suo `PIANO.md`.
 Il nome viene dal latino *vallum*, il terrapieno difensivo degli accampamenti romani (vedi la nota in fondo al README). Fino al 15/11/2026 il progetto si chiamava CyberSegugio.
 
 ## Architettura (decisa il 2026-11-15)
@@ -172,3 +173,4 @@ Dal 16/11 ci sono due binari indipendenti (vedi "Area dell'AI locale"):
 | 2026-11-16 | [locale] | `converti`, giro 2: passi 6 (test della CLI) e 7 (docs), corretti al primo colpo; primi passi con il verificatore |
 | 2026-11-16 | [claude] | Revisione del giro 2: modulo `converti` completo. Idea approvata: "Area dell'AI locale" (sezione nuova), da applicare |
 | 2026-11-16 | [claude] | Area dell'AI locale applicata: il registro trova da solo moduli e suite (non serve più `BUILTIN_MODULES`), comandi in `cybervallum/comandi/<modulo>.py`, documentazione in `docs/moduli/<modulo>.md`, `verifica.py --area` (file fuori area, codice che modifica il sistema o usa la rete), `tests/test_architettura.py` e `tests/test_verifica.py`; regola 7 "una AI per area"; regole dell'area in `.clinerules`; README con `converti` e `processi` in sviluppo. 121 test |
+| 2026-11-17 | [claude] | Idea futura discussa (non in roadmap): servizio web con agenti sulle macchine, da proporre dopo `aggiornamenti` e `api`, prima in VM. Creato lo studio `..\Studio-Castrum` (sistemistica e sicurezza dietro l'app) |
